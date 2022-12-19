@@ -15,7 +15,7 @@ typedef struct {
     int count;
     int capacity;
     uint8_t* code;
-    int* lines;
+    int* lines; // TODO: Run-length encoding
     ValueArray constants;
 } Chunk;
 
