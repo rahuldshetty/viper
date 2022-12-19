@@ -7,6 +7,10 @@
 #include "scanner.h"
 #include "token.h"
 
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
 typedef struct {
    Token current;
    Token previous;
@@ -174,9 +178,29 @@ void emitConstant(Value value){
 
 void endCompiler(){
     emitReturn();
+#ifdef DEBUG_PRINT_CODE
+    if(!parser.hadError){
+        disassembleChunk(currentChunk(), "code");
+    }
+#endif
+
 }
 
 void parsePrecedence(Precedence precedence) {
+    advance_parser();
+    ParseFn prefixRule = getRule(parser.previous.type) -> prefix;
+    if(prefixRule == NULL){
+        error("Expected expression.");
+        return;
+    }
+
+    prefixRule();
+
+    while(precedence <= getRule(parser.current.type)->precedence){
+        advance_parser();
+        ParseFn infixRule = getRule(parser.previous.type)->infix;
+        infixRule();
+    }
 
 }
 
@@ -235,7 +259,7 @@ bool compile(const char* source, Chunk* chunk){
     parser.hadError = false;
     parser.panicMode = false;
 
-    advance();
+    advance_parser();
     expression();
     consume(TOKEN_EOF, "Expected end of expression.");
 
