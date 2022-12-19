@@ -42,5 +42,6 @@ Token number();
 Token identifier();
 
 TokenType identifierType();
+TokenType checkKeyword(int start, int length, const char* rest, TokenType type);
 
 #endif

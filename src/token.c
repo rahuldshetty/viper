@@ -84,7 +84,7 @@ Token number(){
     while(isDigit(peek())) advance();
 
     // Look for fractional part by matching dot
-    if(peek() == "." && isDigit(peekNext())){
+    if(peek() == '.' && isDigit(peekNext())){
         // consume dot
         advance();
 
@@ -100,5 +100,48 @@ Token identifier(){
 }
 
 TokenType identifierType(){
+    switch (scanner.start[0])
+    {
+        case 'a': return checkKeyword(1, 2, "nd", TOKEN_AND);
+        case 'c': return checkKeyword(1, 4, "lass", TOKEN_CLASS);
+        case 'e': return checkKeyword(1, 3, "lse", TOKEN_ELSE);
+        case 'f':
+            if(scanner.current - scanner.start == 1 && scanner.start[1] == 'n'){
+                return TOKEN_FUNCTION;
+            }
+            else if(scanner.current - scanner.start > 1){
+                switch (scanner.start[1])
+                {
+                    case 'a': checkKeyword(2, 3, "lse", TOKEN_FALSE);
+                    case 'o': checkKeyword(2, 1, "r", TOKEN_FOR);
+                }
+            }
+            break;
+        case 'i': return checkKeyword(1, 1, "f", TOKEN_IF);
+        case 'n': return checkKeyword(1, 3, "ull", TOKEN_NULL);
+        case 'o': return checkKeyword(1, 1, "r", TOKEN_OR);
+        case 'p': return checkKeyword(1, 4, "rint", TOKEN_PRINT);
+        case 'r': return checkKeyword(1, 5, "eturn", TOKEN_RETURN);
+        case 's': return checkKeyword(1, 4, "uper", TOKEN_SUPER);
+        case 't':
+            if (scanner.current - scanner.start > 1) {
+                switch (scanner.start[1]) {
+                    case 'h': return checkKeyword(2, 2, "is", TOKEN_THIS);
+                    case 'r': return checkKeyword(2, 2, "ue", TOKEN_TRUE);
+                }
+            }
+            break;
+        case 'v': return checkKeyword(1, 2, "ar", TOKEN_VAR);
+        case 'w': return checkKeyword(1, 4, "hile", TOKEN_WHILE);
+    }
+
+    return TOKEN_IDENTIFIER;
+}
+
+TokenType checkKeyword(int start, int length, const char* rest, TokenType type){
+    if(scanner.current - scanner.start == start + length &&
+            memcmp(scanner.start + start, rest, length) == 0){
+        return type;            
+    }
     return TOKEN_IDENTIFIER;
 }

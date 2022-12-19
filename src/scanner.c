@@ -52,7 +52,7 @@ void skipWhitespace(){
             case '/':
                 if(peekNext() == '/'){
                     // skip comment 
-                    while (peek() != "\n" && !isAtEnd()) advance();
+                    while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
                     return;
                 }

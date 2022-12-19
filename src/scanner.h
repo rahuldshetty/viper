@@ -17,6 +17,7 @@ char advance();
 char peek();
 char peekNext();
 
+bool isAtEnd();
 bool match(char expected);
 bool isDigit(char c);
 bool isAlpha(char c);
