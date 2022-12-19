@@ -18,6 +18,8 @@ typedef struct {
    bool panicMode;
 } Parser;
 
+// TODO: Ternary Operator
+
 typedef enum {
   PREC_NONE,
   PREC_ASSIGNMENT,  // =
