@@ -19,6 +19,7 @@ char peekNext();
 
 bool match(char expected);
 bool isDigit(char c);
+bool isAlpha(char c);
 
 Scanner scanner;
 

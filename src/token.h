@@ -36,7 +36,11 @@ typedef struct{
 Token scanToken();
 Token makeToken(TokenType type);
 Token errorToken(const char* message);
+
 Token string();
 Token number();
+Token identifier();
+
+TokenType identifierType();
 
 #endif

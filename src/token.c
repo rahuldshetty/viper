@@ -11,6 +11,7 @@ Token scanToken(){
 
     char c = advance();
 
+    if(isAlpha(c)) return identifier();
     if(isDigit(c)) return number();
 
     switch (c)
@@ -91,4 +92,13 @@ Token number(){
     }
 
     return makeToken(TOKEN_NUMBER);
+}
+
+Token identifier(){
+    while(isAlpha(peek()) || isDigit(peek()) ) advance();
+    return makeToken(identifierType());
+}
+
+TokenType identifierType(){
+    return TOKEN_IDENTIFIER;
 }
