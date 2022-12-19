@@ -9,7 +9,7 @@
 typedef struct {
     Chunk* chunk;
     uint8_t* ip;
-    Value stack[STACK_MAX];
+    Value stack[STACK_MAX]; // TODO: dynamically grow Stack
     Value* stackTop;
 } VM;
 
@@ -26,7 +26,7 @@ void resetStack();
 InterpretResult run();
 InterpretResult interpret(Chunk* chunk);
 
-void push(Value value);
+void push(Value value); 
 Value pop();
 
 #endif

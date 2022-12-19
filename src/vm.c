@@ -59,7 +59,7 @@ InterpretResult run(){
             case OP_DIVIDE:         BINARY_OP(/); break;
 
             // Unary Operators
-            case OP_NEGATE:         push(-pop()); break;
+            case OP_NEGATE:         *(vm.stackTop-1) = - *(vm.stackTop-1); break;
 
             case OP_RETURN: {
                 printValue(pop());
