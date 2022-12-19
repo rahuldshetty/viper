@@ -3,6 +3,9 @@
 #include "scanner.h"
 #include "token.h"
 
+// TODO: String interpolation ${}
+// TODO: Contextual Keywords - async, await, 
+
 Token scanToken(){
     skipWhitespace();
     scanner.start = scanner.current;
