@@ -1,11 +1,16 @@
 #ifndef viper_vm_h
 #define viper_vm_h
 
+#define STACK_MAX 256
+
 #include "chunk.h"
+#include "value.h"
 
 typedef struct {
     Chunk* chunk;
     uint8_t* ip;
+    Value stack[STACK_MAX];
+    Value* stackTop;
 } VM;
 
 typedef enum {
@@ -16,8 +21,12 @@ typedef enum {
 
 void initVM();
 void freeVM();
+void resetStack();
 
 InterpretResult run();
 InterpretResult interpret(Chunk* chunk);
+
+void push(Value value);
+Value pop();
 
 #endif
