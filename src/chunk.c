@@ -37,5 +37,5 @@ int addConstant(Chunk* chunk, Value value){
 }
 
 void writeConstant(Chunk* chunk, Value value, int line) {
-    // TODO
+    // TODO: Long Constant Values
 }
