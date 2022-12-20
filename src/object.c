@@ -42,3 +42,7 @@ void printObject(Value value){
             break;
     }
 }
+
+ObjString* takeString(char* chars, int length){
+    return allocateString(chars, length);
+}

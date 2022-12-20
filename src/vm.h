@@ -30,5 +30,6 @@ void push(Value value);
 Value pop();
 Value peek_stack(int distance);
 bool isFalsey(Value value);
+void concatenate();
 
 #endif

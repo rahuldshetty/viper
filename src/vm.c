@@ -1,9 +1,12 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "common.h"
 #include "compiler.h"
 #include "debug.h"
+#include "memory.h"
+#include "object.h"
 #include "value.h"
 #include "vm.h"
 
@@ -89,7 +92,19 @@ InterpretResult run(){
             case OP_GREATER:        BINARY_OP(BOOL_VAL, >); break;
             
             // Binary Operators
-            case OP_ADD:            BINARY_OP(NUMBER_VAL, +); break;
+            case OP_ADD:{
+                if (IS_STRING(peek_stack(0)) && IS_STRING(peek_stack(1))) {
+                    concatenate();
+                } else if(IS_NUMBER(peek_stack(0)) && IS_NUMBER(peek_stack(1))) {
+                    double b = AS_NUMBER(pop());
+                    double a = AS_NUMBER(pop());
+                    push(NUMBER_VAL(a + b));
+                } else {
+                    runtimeError("Operands must be two numbers or two strings.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+            }        
             case OP_MINUS:          BINARY_OP(NUMBER_VAL, -); break;
             case OP_MULTIPLY:       BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:         BINARY_OP(NUMBER_VAL, /); break;
@@ -153,4 +168,18 @@ Value peek_stack(int distance){
 
 bool isFalsey(Value value){
     return IS_NULL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
+void concatenate(){
+    ObjString* b = AS_STRING(pop());
+    ObjString* a = AS_STRING(pop());
+    
+    int length = a->length + b->length;
+    char* chars = ALLOCATE(char, length + 1);
+    memcpy(chars, a->chars, a->length);
+    memcpy(chars + a->length, b->chars, b->length);
+    chars[length] = '\0';
+
+    ObjString* result = takeString(chars, length);
+    push(OBJ_VAL(result));
 }
