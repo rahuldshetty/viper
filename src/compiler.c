@@ -65,31 +65,31 @@ ParseRule rules[] = {
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
   [TOKEN_DIVIDE]        = {NULL,     binary, PREC_FACTOR},
   [TOKEN_MULTIPLY]      = {NULL,     binary, PREC_FACTOR},
-  [TOKEN_NOT]           = {unary,     NULL,   PREC_NONE},
-  [TOKEN_NOT_EQUAL]     = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_NOT]           = {unary,    NULL,   PREC_NONE},
+  [TOKEN_NOT_EQUAL]     = {NULL,     binary, PREC_EQUALITY},
   [TOKEN_EQUAL]         = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_EQUAL_EQUAL]   = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_GREATER]       = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_GREATER_EQUAL] = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_LESS]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_LESS_EQUAL]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_EQUAL_EQUAL]   = {NULL,     binary,   PREC_EQUALITY},
+  [TOKEN_GREATER]       = {NULL,     binary,   PREC_COMPARISON},
+  [TOKEN_GREATER_EQUAL] = {NULL,     binary,   PREC_COMPARISON},
+  [TOKEN_LESS]          = {NULL,     binary,   PREC_COMPARISON},
+  [TOKEN_LESS_EQUAL]    = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
   [TOKEN_STRING]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {number_constant,   NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_FALSE]         = {literal,     NULL,   PREC_NONE},
+  [TOKEN_FALSE]         = {literal,  NULL,   PREC_NONE},
   [TOKEN_FOR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_FUNCTION]      = {NULL,     NULL,   PREC_NONE},
   [TOKEN_IF]            = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_NULL]          = {literal,     NULL,   PREC_NONE},
+  [TOKEN_NULL]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_OR]            = {NULL,     NULL,   PREC_NONE},
   [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_THIS]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_TRUE]          = {literal,     NULL,   PREC_NONE},
+  [TOKEN_TRUE]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
@@ -220,6 +220,13 @@ void binary(){
 
     switch (operatorType)
     {
+        case TOKEN_NOT_EQUAL:               emitBytes(OP_EQUAL, OP_NOT); break;
+        case TOKEN_EQUAL_EQUAL:             emitByte(OP_EQUAL); break;
+        case TOKEN_GREATER:                 emitByte(OP_GREATER); break;
+        case TOKEN_GREATER_EQUAL:           emitBytes(OP_LESS, OP_NOT); break;
+        case TOKEN_LESS:                    emitByte(OP_LESS); break;
+        case TOKEN_LESS_EQUAL:              emitBytes(OP_GREATER, OP_NOT); break;
+
         case TOKEN_ADD:                     emitByte(OP_ADD); break;
         case TOKEN_MINUS:                   emitByte(OP_MINUS); break;
         case TOKEN_MULTIPLY:                emitByte(OP_MULTIPLY); break;
