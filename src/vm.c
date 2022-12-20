@@ -73,6 +73,11 @@ InterpretResult run(){
                 printf("\n");
                 break;
             }
+
+            case OP_NULL: push(NULL_VAL); break;
+            case OP_TRUE: push(BOOL_VAL(true)); break;
+            case OP_FALSE: push(BOOL_VAL(false)); break;
+            
             
             // Binary Operators
             case OP_ADD:            BINARY_OP(NUMBER_VAL, +); break;

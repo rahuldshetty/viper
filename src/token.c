@@ -111,12 +111,11 @@ TokenType identifierType(){
         case 'f':
             if(scanner.current - scanner.start == 1 && scanner.start[1] == 'n'){
                 return TOKEN_FUNCTION;
-            }
-            else if(scanner.current - scanner.start > 1){
+            } else if(scanner.current - scanner.start > 1){
                 switch (scanner.start[1])
                 {
-                    case 'a': checkKeyword(2, 3, "lse", TOKEN_FALSE);
-                    case 'o': checkKeyword(2, 1, "r", TOKEN_FOR);
+                    case 'a': return checkKeyword(2, 3, "lse", TOKEN_FALSE);
+                    case 'o': return checkKeyword(2, 1, "r", TOKEN_FOR);
                 }
             }
             break;

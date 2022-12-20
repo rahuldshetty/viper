@@ -26,6 +26,15 @@ int disassembleInstruction(Chunk* chunk, int offset){
         case OP_CONSTANT:
             return constantInstruction("OP_CONSTANT", chunk, offset);
 
+        case OP_NULL:
+            return simpleInstruction("OP_NULL", offset);
+        
+        case OP_TRUE:
+            return simpleInstruction("OP_TRUE", offset);
+        
+        case OP_FALSE:
+            return simpleInstruction("OP_FALSE", offset);
+
         case OP_ADD:
             return simpleInstruction("OP_ADD", offset);
         
