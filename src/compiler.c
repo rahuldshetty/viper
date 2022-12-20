@@ -52,6 +52,7 @@ void unary();
 void grouping();
 void binary();
 void literal();
+void string_constant();
 
 ParseRule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
@@ -74,7 +75,7 @@ ParseRule rules[] = {
   [TOKEN_LESS]          = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS_EQUAL]    = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_STRING]        = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_STRING]        = {string_constant,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {number_constant,   NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
@@ -249,6 +250,14 @@ void literal(){
 void number_constant(){
     double value = strtod(parser.previous.start, NULL);
     emitConstant(NUMBER_VAL(value));
+}
+
+void string_constant(){
+    emitConstant(
+        OBJ_VAL(
+            copyString(parser.previous.start + 1, parser.previous.length - 2)
+        )
+    );
 }
 
 void unary(){
