@@ -10,10 +10,9 @@
 #include "value.h"
 #include "vm.h"
 
-VM vm;
-
 void initVM(){
     resetStack();
+    vm.objects = NULL;
 }
 
 void resetStack(){
@@ -34,7 +33,7 @@ void runtimeError(const char* format, ...){
 }
 
 void freeVM(){
-
+    freeObjects();
 }
 
 InterpretResult run(){

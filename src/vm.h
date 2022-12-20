@@ -11,7 +11,10 @@ typedef struct {
     uint8_t* ip;
     Value stack[STACK_MAX]; // TODO: dynamically grow Stack
     Value* stackTop;
+    Obj* objects;
 } VM;
+
+VM vm;
 
 typedef enum {
     INTERPRET_OK,
