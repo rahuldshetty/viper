@@ -13,6 +13,7 @@
 void initVM(){
     resetStack();
     vm.objects = NULL;
+    initTable(&vm.strings);
 }
 
 void resetStack(){
@@ -33,6 +34,7 @@ void runtimeError(const char* format, ...){
 }
 
 void freeVM(){
+    freeTable(&vm.strings);
     freeObjects();
 }
 
