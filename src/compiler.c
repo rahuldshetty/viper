@@ -65,7 +65,7 @@ ParseRule rules[] = {
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
   [TOKEN_DIVIDE]        = {NULL,     binary, PREC_FACTOR},
   [TOKEN_MULTIPLY]      = {NULL,     binary, PREC_FACTOR},
-  [TOKEN_NOT]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_NOT]           = {unary,     NULL,   PREC_NONE},
   [TOKEN_NOT_EQUAL]     = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EQUAL]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EQUAL_EQUAL]   = {NULL,     NULL,   PREC_NONE},
@@ -252,6 +252,7 @@ void unary(){
 
     switch (operatorType)
     {
+        case TOKEN_NOT: emitByte(OP_NOT); break;
         case TOKEN_MINUS: emitByte(OP_NEGATE); break;
         default: return;
     }

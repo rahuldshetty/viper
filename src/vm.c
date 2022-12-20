@@ -85,6 +85,10 @@ InterpretResult run(){
             case OP_MULTIPLY:       BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:         BINARY_OP(NUMBER_VAL, /); break;
 
+            case OP_NOT:
+                *(vm.stackTop-1) = (BOOL_VAL(isFalsey(*(vm.stackTop-1))));
+                break;
+
             // Unary Operators
             case OP_NEGATE:         
                 if(!IS_NUMBER(peek_stack(0))){
@@ -136,4 +140,8 @@ Value pop(){
 
 Value peek_stack(int distance){
     return vm.stackTop[-1 - distance];
+}
+
+bool isFalsey(Value value){
+    return IS_NULL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
