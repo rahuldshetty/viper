@@ -152,6 +152,16 @@ void consume(TokenType type, const char* message){
     errorAtCurrent(message);
 }
 
+bool check(TokenType type){
+    return parser.current.type == type;
+}
+
+bool match_parser(TokenType type){
+    if(!check(type)) return false;
+    advance_parser();
+    return true;
+}
+
 void emitByte(uint8_t byte){
     writeChunk(currentChunk(), byte, parser.previous.line);
 }
@@ -283,6 +293,23 @@ void expression(){
     parsePrecedence(PREC_ASSIGNMENT);
 }
 
+void declaration(){
+    statement();
+}
+
+void statement(){
+    if(match_parser(TOKEN_PRINT)){
+        printStatement();
+    }
+}
+
+void printStatement(){
+    expression();
+    // Semi-colon optional at end of print statement
+    match_parser(TOKEN_SEMICOLON);
+    emitByte(OP_PRINT);
+}
+
 bool compile(const char* source, Chunk* chunk){
     initScanner(source);
     complingChunk = chunk;
@@ -291,8 +318,10 @@ bool compile(const char* source, Chunk* chunk){
     parser.panicMode = false;
 
     advance_parser();
-    expression();
-    consume(TOKEN_EOF, "Expected end of expression.");
+
+    while(!match_parser(TOKEN_EOF)){
+        declaration();
+    }
 
     endCompiler();
 

@@ -73,8 +73,8 @@ InterpretResult run(){
             case OP_CONSTANT: {
                 Value constant = READ_CONSTANT();
                 push(constant);
-                printValue(constant);
-                printf("\n");
+                // printValue(constant);
+                // printf("\n");
                 break;
             }
 
@@ -123,9 +123,13 @@ InterpretResult run(){
                 *(vm.stackTop-1) = NUMBER_VAL(-AS_NUMBER(*(vm.stackTop-1))); 
                 break;
 
-            case OP_RETURN: {
+            case OP_PRINT:{
                 printValue(pop());
                 printf("\n");
+                break;
+            }
+
+            case OP_RETURN: {
                 return INTERPRET_OK;
             }
         }

@@ -6,4 +6,12 @@
 
 bool compile(const char* source, Chunk* chunk);
 
+void expression();
+void declaration();
+
+void statement();
+void printStatement();
+
+
+
 #endif
