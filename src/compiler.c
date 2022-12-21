@@ -51,6 +51,7 @@ void number_constant();
 void unary();
 void grouping();
 void binary();
+void variable();
 void literal();
 void string_constant();
 
@@ -74,7 +75,7 @@ ParseRule rules[] = {
   [TOKEN_GREATER_EQUAL] = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS]          = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS_EQUAL]    = {NULL,     binary,   PREC_COMPARISON},
-  [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_IDENTIFIER]    = {variable,     NULL,   PREC_NONE},
   [TOKEN_STRING]        = {string_constant,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {number_constant,   NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
@@ -219,6 +220,22 @@ void parsePrecedence(Precedence precedence) {
 
 }
 
+uint8_t identifierConstant(Token* name){
+    return makeConstant(
+        OBJ_VAL(
+            copyString(
+                name->start,
+                name->length
+            )
+        )
+    );
+}
+
+uint8_t parseVariable(const char* errorMessage){
+    consume(TOKEN_IDENTIFIER, errorMessage);
+    return identifierConstant(&parser.previous);
+}
+
 ParseRule* getRule(TokenType type){
     return &rules[type];
 }
@@ -294,10 +311,46 @@ void expression(){
 }
 
 void declaration(){
-    statement();
+    if(match_parser(TOKEN_VAR)){
+        varDeclaraction();
+    } else {
+        statement();
+    }
 
     if(parser.panicMode) synchronize();
 }
+
+void defineVariable(uint8_t global){
+    emitBytes(OP_DEFINE_GLOBAL, global);
+}
+
+// Variable Declaraction
+void varDeclaraction(){
+    uint8_t global = parseVariable("Expected variable name.");
+
+    if(match_parser(TOKEN_EQUAL)){
+        expression();
+    } else {
+        emitByte(OP_NULL);
+    }
+
+    match_parser(TOKEN_SEMICOLON);
+    defineVariable(global);
+}
+
+
+// Identifer named vairiable access
+void namedVariable(Token name){
+    uint8_t arg = identifierConstant(&name);
+    emitBytes(OP_GET_GLOBAL, arg);
+}
+
+
+// Variable access
+void variable(){
+    namedVariable(parser.previous);
+}
+
 
 void statement(){
     if(match_parser(TOKEN_PRINT)){
