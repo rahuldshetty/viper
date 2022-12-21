@@ -13,5 +13,6 @@ void statement();
 void printStatement();
 void expressionStatement();
 
+void synchronize();
 
 #endif

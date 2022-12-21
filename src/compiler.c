@@ -295,6 +295,8 @@ void expression(){
 
 void declaration(){
     statement();
+
+    if(parser.panicMode) synchronize();
 }
 
 void statement(){
@@ -334,4 +336,29 @@ bool compile(const char* source, Chunk* chunk){
     endCompiler();
 
     return !parser.hadError;
+}
+
+void synchronize(){
+    parser.panicMode = false;
+
+    while(parser.current.type != TOKEN_EOF){
+        if(parser.previous.type == TOKEN_SEMICOLON) return;
+
+        switch (parser.current.type)
+        {
+            case TOKEN_CLASS:
+            case TOKEN_FUNCTION:
+            case TOKEN_VAR:
+            case TOKEN_FOR:
+            case TOKEN_IF:
+            case TOKEN_WHILE:
+            case TOKEN_PRINT:
+            case TOKEN_RETURN:
+                return;
+
+            default: ;
+        }
+
+        advance_parser();
+    }
 }
