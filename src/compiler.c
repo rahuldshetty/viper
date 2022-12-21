@@ -300,6 +300,8 @@ void declaration(){
 void statement(){
     if(match_parser(TOKEN_PRINT)){
         printStatement();
+    } else {
+        expressionStatement();
     }
 }
 
@@ -308,6 +310,12 @@ void printStatement(){
     // Semi-colon optional at end of print statement
     match_parser(TOKEN_SEMICOLON);
     emitByte(OP_PRINT);
+}
+
+void expressionStatement(){
+    expression();
+    match_parser(TOKEN_SEMICOLON);
+    emitByte(OP_POP);
 }
 
 bool compile(const char* source, Chunk* chunk){
