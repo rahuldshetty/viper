@@ -144,6 +144,20 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_SET_GLOBAL:{
+                ObjString* name = READ_STRING();
+                // Implicit declaration - keep only below line
+                tableSet(&vm.globals, name, peek_stack(0));
+
+                // Explicit declaration - users need to specify `var <identifier>` to declare variable
+                // if( tableSet(&vm.globals, name, peek_stack(0)) ){
+                //     tableDelete(&vm.globals, name);
+                //     runtimeError("Undefined variable '%s'.", name->chars);
+                //     return INTERPRET_RUNTIME_ERROR;
+                // }
+                break;
+            }
+
             case OP_GET_GLOBAL:{
                 ObjString* name = READ_STRING();
                 Value value;
