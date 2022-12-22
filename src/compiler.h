@@ -11,6 +11,10 @@ void expression();
 void declaration();
 void varDeclaraction();
 
+void block();
+void beginScope();
+void endScope();
+
 void statement();
 void printStatement();
 void expressionStatement();

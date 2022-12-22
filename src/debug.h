@@ -7,6 +7,7 @@ void disassembleChunk(Chunk* chunk, const char* name);
 int disassembleInstruction(Chunk* chunk, int offset);
 
 int simpleInstruction(const char* name, int offset);
+int byteInstruction(const char* name, Chunk* chunk, int offset);
 int constantInstruction(const char* name, Chunk* chunk, int offset);
 
 #endif
