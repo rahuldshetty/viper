@@ -21,6 +21,9 @@ void expressionStatement();
 
 void ifStatement();
 
+void and_(bool);
+void or_(bool);
+
 void synchronize();
 
 #endif
