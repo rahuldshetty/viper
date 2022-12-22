@@ -44,6 +44,8 @@ InterpretResult run(){
     #define READ_BYTE() (*vm.ip++)
     #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
     #define READ_STRING() AS_STRING(READ_CONSTANT())
+    #define READ_SHORT() \
+        ( vm.ip += 2, (uint16_t)((vm.ip[-2] << 8 ) | vm.ip[-1] ))
 
     // TODO: Optimize inplace stack binary operation
     #define BINARY_OP(valueType, op) \
@@ -183,6 +185,12 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_JUMP_IF_FALSE: {
+                uint16_t offset = READ_SHORT();
+                if(isFalsey(peek_stack(0))) vm.ip += offset;
+                break;
+            }
+
             case OP_RETURN: {
                 return INTERPRET_OK;
             }
@@ -193,6 +201,7 @@ InterpretResult run(){
     #undef READ_BYTE
     #undef READ_CONSTANT
     #undef BINARY_OP
+    #undef READ_SHORT
 }
 
 InterpretResult interpret(const char* source){

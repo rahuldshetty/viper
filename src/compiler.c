@@ -191,6 +191,13 @@ void emitBytes(uint8_t byte1, uint8_t byte2){
     emitByte(byte2);
 }
 
+int emitJump(uint8_t instruction){
+    emitByte(instruction);
+    emitByte(0xff);
+    emitByte(0xff);
+    return currentChunk()->count - 2;
+}
+
 void emitReturn(){
     emitByte(OP_RETURN);
 }
@@ -209,6 +216,19 @@ uint8_t makeConstant(Value value){
 
 void emitConstant(Value value){
     emitBytes(OP_CONSTANT, makeConstant(value));
+}
+
+void patchJump(int offset){
+    // -2 to adjust for bytecode of jump offset itself
+    int jump = currentChunk()->count - offset - 2;
+
+    if(jump > UINT16_MAX){
+        error("Too much code to jump over.");
+    }
+
+    currentChunk()->code[offset] = (jump >> 8) & 0xff;
+    currentChunk()->code[offset + 1] = jump & 0xff;
+
 }
 
 void endCompiler(){
@@ -482,6 +502,8 @@ void statement(){
     if(match_parser(TOKEN_PRINT)){
         // Parse Print keyword statement
         printStatement();
+    } else if(match_parser(TOKEN_IF)){
+        ifStatement();
     } else if(match_parser(TOKEN_LEFT_BRACE)){
         // Parse Block statements
         beginScope();
@@ -567,4 +589,21 @@ void endScope(){
         current->localCount--;
     }
 
+}
+
+// If statement control flow
+void ifStatement(){
+    // encapsulating "(" ")" is optional
+    bool paranFound = match_parser(TOKEN_LEFT_PAREN);
+    
+    expression();
+
+    if(paranFound){
+        consume(TOKEN_RIGHT_PAREN, "Expected ')' for closing condition.");
+    }
+
+    int thenJump = emitJump(OP_JUMP_IF_FALSE);
+    statement();
+
+    patchJump(thenJump);
 }

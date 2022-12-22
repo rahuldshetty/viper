@@ -19,6 +19,8 @@ void statement();
 void printStatement();
 void expressionStatement();
 
+void ifStatement();
+
 void synchronize();
 
 #endif
