@@ -602,8 +602,26 @@ void ifStatement(){
         consume(TOKEN_RIGHT_PAREN, "Expected ')' for closing condition.");
     }
 
+    /*
+        if(A){
+            B
+        } else {
+            C
+        },
+        D
+
+        if A is true, then B should be executed -> After that D should continue executing. // need to jump over else
+        if A is false, then C should be executed -> After that D should continue executing. // as usual
+
+    */
     int thenJump = emitJump(OP_JUMP_IF_FALSE);
     statement();
 
+    int elseJump = emitJump(OP_JUMP);
+
     patchJump(thenJump);
+
+    if(match_parser(TOKEN_ELSE)) statement();
+    patchJump(elseJump);
+    
 }
