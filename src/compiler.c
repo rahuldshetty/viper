@@ -264,6 +264,9 @@ int resolveLocal(Compiler* compiler, Token* name){
     for(int i = compiler->localCount-1; i >= 0 ; i--){
         Local* local = &compiler->locals[i];
         if(identifiersEqual(name, &local->name)){
+            if(local->depth == -1){
+                error("Can't read local variables in its own initializer.");
+            }
             return i;
         }
     }
@@ -280,9 +283,10 @@ void addLocal(Token name){
 
     Local* local = &current->locals[current->localCount++];
     local->name = name;
-    local->depth = current->scopeDepth;
+    local->depth = -1;
 }
 
+// Variable added to scope but not ready to use yet.
 void declareVariable(){
     if(current->scopeDepth == 0) return;
 
@@ -318,6 +322,10 @@ uint8_t parseVariable(const char* errorMessage){
     if(current->scopeDepth > 0) return 0;
 
     return identifierConstant(&parser.previous);
+}
+
+void markInitialized(){
+    current->locals[current->localCount - 1].depth = current->scopeDepth;
 }
 
 ParseRule* getRule(TokenType type){
@@ -404,9 +412,11 @@ void declaration(){
     if(parser.panicMode) synchronize();
 }
 
+// Variable ready to use.
 void defineVariable(uint8_t global){
     // local variable not processed until runtime
     if(current->scopeDepth > 0){
+        markInitialized();
         return;
     }
 
