@@ -198,6 +198,16 @@ int emitJump(uint8_t instruction){
     return currentChunk()->count - 2;
 }
 
+void emitLoop(int loopStart){
+    emitByte(OP_LOOP);
+
+    int offset = currentChunk()->count - loopStart + 2;
+    if(offset > UINT16_MAX) error("Too large loop body.");
+
+    emitByte((offset >> 8) & 0xff);
+    emitByte(offset & 0xff);
+}
+
 void emitReturn(){
     emitByte(OP_RETURN);
 }
@@ -525,6 +535,8 @@ void statement(){
         printStatement();
     } else if(match_parser(TOKEN_IF)){
         ifStatement();
+    } else if(match_parser(TOKEN_WHILE)){
+        whileStatement();
     } else if(match_parser(TOKEN_LEFT_BRACE)){
         // Parse Block statements
         beginScope();
@@ -540,6 +552,32 @@ void printStatement(){
     // Semi-colon optional at end of print statement
     match_parser(TOKEN_SEMICOLON);
     emitByte(OP_PRINT);
+}
+
+void whileStatement(){
+    int loopStart = currentChunk()->count;
+
+    // Enclosing condition inside '(' ')' is optional 
+    bool paranFound = match_parser(TOKEN_LEFT_PAREN);
+    
+    expression();
+
+    if(paranFound){
+        consume(TOKEN_RIGHT_PAREN, "Expected ')' for closing condition.");
+    }
+
+    // Capture Jump to statement if condition fails
+    int exitJump = emitJump(OP_JUMP_IF_FALSE);
+    emitByte(OP_POP);
+
+    // Run body of while statement
+    statement();
+
+    // Add instruction to loop back to initial condition of stack
+    emitLoop(loopStart);
+
+    patchJump(exitJump);
+    emitByte(OP_POP);
 }
 
 void expressionStatement(){

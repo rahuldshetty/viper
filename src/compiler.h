@@ -20,6 +20,7 @@ void printStatement();
 void expressionStatement();
 
 void ifStatement();
+void whileStatement();
 
 void and_(bool);
 void or_(bool);
