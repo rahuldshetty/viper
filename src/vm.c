@@ -244,24 +244,3 @@ void concatenate(){
     ObjString* result = takeString(chars, length);
     push(OBJ_VAL(result));
 }
-
-
-/*
-TODO: The compiler adds a global variable’s name to the constant table as a 
-string every time an identifier is encountered. 
-It creates a new constant each time, even if that variable name is already
-in a previous slot in the constant table. That’s wasteful in cases where the same 
-variable is referenced multiple times by the same function. That, in turn, increases 
-the odds of filling up the constant table and running out of slots since we allow only 
-256 constants in a single chunk.
-
-Optimize this. How does your optimization 
-affect the performance of the compiler compared to the runtime? Is this the right trade-off?
-
-TODO: Looking up a global variable by name in a hash table 
-each time it is used is pretty slow, even with a good hash table.
- Can you come up with a more efficient
- way to store and access global variables without changing the semantics?
-
-
-*/
