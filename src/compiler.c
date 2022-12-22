@@ -615,11 +615,13 @@ void ifStatement(){
 
     */
     int thenJump = emitJump(OP_JUMP_IF_FALSE);
+    emitByte(OP_POP);
     statement();
 
     int elseJump = emitJump(OP_JUMP);
 
     patchJump(thenJump);
+    emitByte(OP_POP); // Discared condition values
 
     if(match_parser(TOKEN_ELSE)) statement();
     patchJump(elseJump);
