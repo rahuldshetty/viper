@@ -88,6 +88,11 @@ void printObject(Value value){
             break;
         }
 
+        case OBJ_NATIVE:{
+            printf("<built-in fn>");
+            break;
+        }
+
     }
 }
 
@@ -104,4 +109,10 @@ ObjString* takeString(char* chars, int length){
     }
 
     return allocateString(chars, length, hash);
+}
+
+ObjNative* newNative(NativeFn function){
+    ObjNative* native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+    native->function = function;
+    return native;
 }

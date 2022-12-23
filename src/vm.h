@@ -50,4 +50,6 @@ void concatenate();
 bool callFn(ObjFunction* function, int argCount);
 bool callValue(Value callee, int argCount);
 
+void defineNative(const char* name, NativeFn function);
+
 #endif
