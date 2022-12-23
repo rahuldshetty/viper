@@ -21,6 +21,7 @@ void expressionStatement();
 
 void ifStatement();
 void whileStatement();
+void forStatement();
 
 void and_(bool);
 void or_(bool);

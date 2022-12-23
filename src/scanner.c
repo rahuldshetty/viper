@@ -56,6 +56,11 @@ void skipWhitespace(){
                 if(peekNext() == '/'){
                     // skip comment 
                     while (peek() != '\n' && !isAtEnd()) advance();
+                    
+                    // ignore new line character
+                    scanner.line++;
+                    advance();
+                    continue;
                 } else {
                     return;
                 }

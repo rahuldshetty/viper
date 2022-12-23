@@ -535,6 +535,8 @@ void statement(){
         printStatement();
     } else if(match_parser(TOKEN_IF)){
         ifStatement();
+    } else if(match_parser(TOKEN_FOR)){
+        forStatement();
     } else if(match_parser(TOKEN_WHILE)){
         whileStatement();
     } else if(match_parser(TOKEN_LEFT_BRACE)){
@@ -554,6 +556,7 @@ void printStatement(){
     emitByte(OP_PRINT);
 }
 
+// Loop - While Statement
 void whileStatement(){
     int loopStart = currentChunk()->count;
 
@@ -578,6 +581,67 @@ void whileStatement(){
 
     patchJump(exitJump);
     emitByte(OP_POP);
+}
+
+
+// Loop - For Statement
+void forStatement(){
+    // Variable declared within loop statement are scoped internally only.
+    beginScope();
+
+    // Enclosing condition inside '(' ')' is optional 
+    bool paranFound = match_parser(TOKEN_LEFT_PAREN);
+    // Initializer
+    if(match_parser(TOKEN_SEMICOLON)){
+        // empty initializer field in for-loop
+    } else if(match_parser(TOKEN_VAR) || check(TOKEN_IDENTIFIER) ){
+        varDeclaraction();
+    } else {
+        expressionStatement();
+    }
+    
+    // Condition
+    int loopStart = currentChunk()->count;
+    int exitJump = -1;
+    if(!match_parser(TOKEN_SEMICOLON)){
+        expression();
+        consume(TOKEN_SEMICOLON, "Expected ';' after loop condition.");
+
+        // Jump out of the loop if condition is false
+        exitJump = emitJump(OP_JUMP_IF_FALSE);
+        emitByte(OP_POP);
+    }
+
+    // Increment expression evaluate
+    if(!match_parser(TOKEN_RIGHT_PAREN)){
+        // track where increment expression begins in stack
+        int bodyJump = emitJump(OP_JUMP);
+        int incrementStart = currentChunk()->count;
+
+        // parse increment expression
+        expression();
+        emitByte(OP_POP);
+        if(paranFound){
+            consume(TOKEN_RIGHT_PAREN, "Expected ')' for closing condition.");
+        }
+
+        // go to start of increment 
+        emitLoop(loopStart);
+        loopStart = incrementStart;
+        patchJump(bodyJump);
+    }
+
+    // Body of loop
+    statement();
+    emitLoop(loopStart);
+
+    if(exitJump != -1){
+        patchJump(exitJump);
+        emitByte(OP_POP);
+    }
+
+    // End scope
+    endScope();
 }
 
 void expressionStatement(){
