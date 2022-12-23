@@ -3,3 +3,5 @@ fn areWeHavingItYet () {
 }
 
 print areWeHavingItYet;
+
+areWeHavingItYet();

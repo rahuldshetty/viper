@@ -76,9 +76,10 @@ void binary(bool canAssign);
 void variable(bool canAssign);
 void literal(bool canAssign);
 void string_constant(bool canAssign);
+void call(bool);
 
 ParseRule rules[] = {
-  [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
+  [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
   [TOKEN_RIGHT_BRACE]   = {NULL,     NULL,   PREC_NONE},
@@ -557,6 +558,31 @@ void function(FunctionType type){
     ObjFunction* function = endCompiler();
     emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
 }
+
+// Argument processing for function call
+uint8_t argumentList(){
+    uint8_t argCount = 0;
+
+    if(!check(TOKEN_RIGHT_PAREN)){
+        do{
+            expression();
+            if(argCount==255){
+                error("Can't have more than 255 arguments.");
+            }
+            argCount++;
+        } while(match_parser(TOKEN_COMMA));
+    }
+
+    consume(TOKEN_RIGHT_PAREN, "Expected ')' afer arguments.");
+    return argCount;
+}
+
+// Function Call
+void call(bool canAsign){
+    uint8_t argCount = argumentList();
+    emitBytes(OP_CALL, argCount);
+}
+
 
 // Identifer named vairiable access
 void namedVariable(Token name, bool canAssign){

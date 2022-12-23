@@ -211,6 +211,15 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_CALL:{
+                int argCount = READ_BYTE();
+                if(!callValue(peek_stack(argCount), argCount)){
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                frame = &vm.frames[vm.frameCount - 1];
+                break;
+            }
+
             case OP_RETURN: {
                 return INTERPRET_OK;
             }
@@ -229,10 +238,7 @@ InterpretResult interpret(const char* source){
     if(function==NULL) return INTERPRET_COMPILE_ERROR;
 
     push(OBJ_VAL(function));
-    CallFrame* frame = &vm.frames[vm.frameCount++];
-    frame->function = function;
-    frame->ip = function->chunk.code;
-    frame->slots = vm.stack;
+    callFn(function, 0);
 
     return run();
 }
@@ -267,4 +273,25 @@ void concatenate(){
 
     ObjString* result = takeString(chars, length);
     push(OBJ_VAL(result));
+}
+
+bool callFn(ObjFunction* function, int argCount){
+    CallFrame* frame = &vm.frames[vm.frameCount++];
+    frame->function = function;
+    frame->ip = function->chunk.code;
+    frame->slots = vm.stackTop - argCount - 1;
+    return true;
+}
+
+bool callValue(Value callee, int argCount){
+    if(IS_OBJ(callee)){
+        switch (OBJ_TYPE(callee)){
+            case OBJ_FUNCTION:
+                return callFn(AS_FUNCTION(callee), argCount);
+            default:
+                break;
+        }
+    }
+    runtimeError("Can only call functions and classes.");
+    return false;
 }

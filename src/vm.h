@@ -47,5 +47,7 @@ Value pop();
 Value peek_stack(int distance);
 bool isFalsey(Value value);
 void concatenate();
+bool callFn(ObjFunction* function, int argCount);
+bool callValue(Value callee, int argCount);
 
 #endif
