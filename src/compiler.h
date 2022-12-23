@@ -19,6 +19,7 @@ void beginScope();
 void endScope();
 
 void statement();
+void returnStatement();
 void printStatement();
 void expressionStatement();
 

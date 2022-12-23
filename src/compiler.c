@@ -236,6 +236,7 @@ void emitLoop(int loopStart){
 }
 
 void emitReturn(){
+    emitByte(OP_NULL); // return NULL by default from function calls
     emitByte(OP_RETURN);
 }
 
@@ -628,6 +629,8 @@ void statement(){
         printStatement();
     } else if(match_parser(TOKEN_IF)){
         ifStatement();
+    } else if(match_parser(TOKEN_RETURN)){
+        returnStatement();
     } else if(match_parser(TOKEN_FOR)){
         forStatement();
     } else if(match_parser(TOKEN_WHILE)){
@@ -639,6 +642,21 @@ void statement(){
         endScope();
     } else {
         expressionStatement();
+    }
+}
+
+void returnStatement(){
+    if(current->type == TYPE_SCRIPT){
+        error("Can't return from top-level code.");
+    }
+    
+    if(!match_parser(TOKEN_SEMICOLON)){
+        expression();   
+        match_parser(TOKEN_SEMICOLON);
+        emitByte(OP_RETURN);
+    } else {
+        // if semicolon is found or not, then its direct return.
+        emitReturn();
     }
 }
 
