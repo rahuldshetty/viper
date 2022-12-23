@@ -11,6 +11,9 @@ void expression();
 void declaration();
 void varDeclaraction();
 
+void functionDeclaration();
+void function();
+
 void block();
 void beginScope();
 void endScope();

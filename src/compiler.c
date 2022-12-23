@@ -31,6 +31,8 @@ typedef enum {
 } FunctionType;
 
 typedef struct {
+    struct Compiler* enclosing; // Used to return control from function to parent callee flow
+
     ObjFunction* function;
     FunctionType type;
 
@@ -122,15 +124,24 @@ Parser parser;
 Compiler* current = NULL; // TODO: multiple compilers running in parallel
 
 Chunk* currentChunk(){
-    return &current->function->chunk;
+    return &(current->function->chunk);
 }
 
 void initCompiler(Compiler* compiler, FunctionType type){
+    compiler->enclosing = (struct Compiler*) current;
     compiler->type = type;
     compiler->localCount = 0;
     compiler->scopeDepth = 0;
     compiler->function = newFunction();
     current = compiler;
+    
+    // Copy function name
+    if(type != TYPE_SCRIPT){
+        current->function->name = copyString(
+            parser.previous.start,
+            parser.previous.length
+        );
+    }
 
     // Compiler claims variable stack's 0th location
     Local* local = &current->locals[current->localCount++];
@@ -267,8 +278,8 @@ ObjFunction* endCompiler(){
     }
 #endif
 
+    current = (Compiler*) current->enclosing;
     return function;
-
 }
 
 void parsePrecedence(Precedence precedence) {
@@ -375,6 +386,7 @@ uint8_t parseVariable(const char* errorMessage){
 }
 
 void markInitialized(){
+    if(current->scopeDepth == 0) return;
     current->locals[current->localCount - 1].depth = current->scopeDepth;
 }
 
@@ -453,7 +465,9 @@ void expression(){
 }
 
 void declaration(){
-    if(match_parser(TOKEN_VAR)){
+    if(match_parser(TOKEN_FUNCTION)){
+        functionDeclaration();
+    } else if(match_parser(TOKEN_VAR)){
         varDeclaraction();
     } else {
         statement();
@@ -508,6 +522,41 @@ void varDeclaraction(){
     defineVariable(global);
 }
 
+// Function Declaration
+void functionDeclaration(){
+    uint8_t global = parseVariable("Expected function name.");
+    markInitialized();
+    function(TYPE_FUNCTION);
+    defineVariable(global);
+}
+
+
+void function(FunctionType type){
+    Compiler compiler;
+    initCompiler(&compiler, type);
+    beginScope();
+
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after function name.");
+
+    // Parameter processing
+    if(!check(TOKEN_RIGHT_PAREN)){
+        do{
+            current->function->arity++;
+            if(current->function->arity > 255){
+                errorAtCurrent("Can't have more than 255 parameters.");
+            }
+            uint8_t constant = parseVariable("Expected parameter name");
+            defineVariable(constant);
+        } while(match_parser(TOKEN_COMMA));
+    }
+
+    consume(TOKEN_RIGHT_PAREN, "Expected ')' after parameters.");
+    consume(TOKEN_LEFT_BRACE, "Expected '{' before function body.");
+    block();
+
+    ObjFunction* function = endCompiler();
+    emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
+}
 
 // Identifer named vairiable access
 void namedVariable(Token name, bool canAssign){
@@ -546,8 +595,6 @@ void block(){
 
     consume(TOKEN_RIGHT_BRACE, "Expected '}' after block.");
 }
-
-
 
 void statement(){
     if(match_parser(TOKEN_PRINT)){

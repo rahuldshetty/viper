@@ -112,7 +112,7 @@ TokenType identifierType(){
         case 'c': return checkKeyword(1, 4, "lass", TOKEN_CLASS);
         case 'e': return checkKeyword(1, 3, "lse", TOKEN_ELSE);
         case 'f':
-            if(scanner.current - scanner.start == 1 && scanner.start[1] == 'n'){
+            if(scanner.current - scanner.start == 2 && scanner.start[1] == 'n'){
                 return TOKEN_FUNCTION;
             } else if(scanner.current - scanner.start > 1){
                 switch (scanner.start[1])
