@@ -38,17 +38,20 @@ bool match(char expected){
 void skipWhitespace(){
     for(;;){
         char c = peek();
+
         switch(c){
             case ' ':
             case '\r':
             case '\t':
                 advance();
                 break;
+
             case '\n':
                 // advance scanner line
                 scanner.line++;
                 advance();
                 break;
+
             case '/':
                 if(peekNext() == '/'){
                     // skip comment 

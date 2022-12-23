@@ -9,10 +9,13 @@
 Token scanToken(){
     skipWhitespace();
     scanner.start = scanner.current;
-
+    
     if(isAtEnd()) return makeToken(TOKEN_EOF);
 
     char c = advance();
+
+    // Make sure current  token is not EOF
+    if(isAtEnd()) return makeToken(TOKEN_EOF);
 
     if(isAlpha(c)) return identifier();
     if(isDigit(c)) return number();
