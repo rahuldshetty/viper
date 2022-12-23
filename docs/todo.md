@@ -42,3 +42,21 @@ each time it is used is pretty slow, even with a good hash table.
  way to store and access global variables without changing the semantics?
 
 15) Dynamically grow Stack
+
+16) Add support for Switch Construct
+
+switch-Statement     → "switch" "(" expression ")"
+                 "{" switchCase* defaultCase? "}" ;
+switchCase     → "case" expression ":" statement* ;
+defaultCase    → "default" ":" statement* ;
+To execute a switch statement, first evaluate the parenthesized switch value expression. Then walk the cases. For each case, evaluate its value expression. If the case value is equal to the switch value, execute the statements under the case and then exit the switch statement. Otherwise, try the next case. If no case matches and there is a default clause, execute its statements.
+
+
+
+17) Add support for break and continue statements.
+
+A continue statement jumps directly to the top of the nearest enclosing loop, skipping the rest of the loop body. Inside a for loop, a continue jumps to the increment clause, if there is one. It’s a compile-time error to have a continue statement not enclosed in a loop.
+
+Make sure to think about scope. What should happen to local variables declared inside the body of the loop or in blocks nested inside the loop when a continue is executed?
+
+18) 
