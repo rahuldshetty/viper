@@ -25,7 +25,15 @@ typedef struct{
     int depth;
 } Local;
 
+typedef enum {
+    TYPE_FUNCTION, // Body of function
+    TYPE_SCRIPT, // Top level code is also a function type
+} FunctionType;
+
 typedef struct {
+    ObjFunction* function;
+    FunctionType type;
+
     Local locals[UINT8_COUNT];
     int localCount;
     int scopeDepth;
@@ -112,16 +120,23 @@ ParseRule rules[] = {
 
 Parser parser;
 Compiler* current = NULL; // TODO: multiple compilers running in parallel
-Chunk* complingChunk;
 
 Chunk* currentChunk(){
-    return complingChunk;
+    return &current->function->chunk;
 }
 
-void initCompiler(Compiler* compiler){
+void initCompiler(Compiler* compiler, FunctionType type){
+    compiler->type = type;
     compiler->localCount = 0;
     compiler->scopeDepth = 0;
+    compiler->function = newFunction();
     current = compiler;
+
+    // Compiler claims variable stack's 0th location
+    Local* local = &current->locals[current->localCount++];
+    local->depth = 0;
+    local->name.start = "";
+    local->name.length = 0;
 }
 
 void errorAt(Token* token, const char* message){
@@ -241,13 +256,18 @@ void patchJump(int offset){
 
 }
 
-void endCompiler(){
+ObjFunction* endCompiler(){
     emitReturn();
+    ObjFunction* function = current->function;
+
 #ifdef DEBUG_PRINT_CODE
     if(!parser.hadError){
-        disassembleChunk(currentChunk(), "code");
+        disassembleChunk(currentChunk(), function->name != NULL ? 
+            function->name->chars: "<script>");
     }
 #endif
+
+    return function;
 
 }
 
@@ -650,13 +670,11 @@ void expressionStatement(){
     emitByte(OP_POP);
 }
 
-bool compile(const char* source, Chunk* chunk){
+ObjFunction* compile(const char* source){
     initScanner(source);
 
     Compiler compiler;
-    initCompiler(&compiler);
-
-    complingChunk = chunk;
+    initCompiler(&compiler, TYPE_SCRIPT);
     
     parser.hadError = false;
     parser.panicMode = false;
@@ -667,9 +685,8 @@ bool compile(const char* source, Chunk* chunk){
         declaration();
     }
 
-    endCompiler();
-
-    return !parser.hadError;
+    ObjFunction* function = endCompiler();
+    return parser.hadError ? NULL : function;
 }
 
 void synchronize(){
