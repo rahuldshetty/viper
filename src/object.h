@@ -38,16 +38,24 @@ struct ObjString{
     uint32_t hash;
 };
 
+typedef struct ObjUpvalue {
+    Obj obj;
+    Value* location;
+} ObjUpvalue;
+
 typedef struct {
     Obj obj;
     int arity;
     Chunk chunk;
     ObjString* name;
+    int upvalueCount;
 } ObjFunction;
 
 typedef struct{
     Obj obj;
     ObjFunction* function;
+    ObjUpvalue** upvalues;
+    int upvalueCount;
 } ObjClosure;
 
 typedef Value (*NativeFn)(int argCount, Value* args);
@@ -65,5 +73,7 @@ ObjString* takeString(char* chars, int length);
 ObjFunction* newFunction();
 ObjClosure* newClosure(ObjFunction* function);
 ObjNative* newNative(NativeFn function);
+
+ObjUpvalue* newObjUpvalue(Value* slot);
 
 #endif

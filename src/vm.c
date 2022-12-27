@@ -217,6 +217,18 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_GET_UPVALUE:{
+                uint8_t slot = READ_BYTE();
+                push(*frame->closure->upvalues[slot]->location);
+                break;
+            }
+
+            case OP_SET_UPVALUE:{
+                uint8_t slot = READ_BYTE();
+                *frame->closure->upvalues[slot]->location = peek_stack(0);
+                break;
+            }
+
             case OP_JUMP_IF_FALSE: {
                 uint16_t offset = READ_SHORT();
                 if(isFalsey(peek_stack(0))) frame->ip += offset;
@@ -262,6 +274,19 @@ InterpretResult run(){
                 ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
                 ObjClosure* closure = newClosure(function);
                 push(OBJ_VAL(closure));
+
+                for(int i = 0;i <closure->upvalueCount; i++){
+                    uint8_t isLocal = READ_BYTE();
+                    uint8_t index = READ_BYTE();
+
+                    if(isLocal){
+                        closure->upvalues[i] = captureUpvalue(frame->slots + index);
+                    } else {
+                        closure->upvalues[i] = frame->closure->upvalues[index];
+                    }
+
+                }
+                
                 break;
             }
 
@@ -366,4 +391,9 @@ bool callValue(Value callee, int argCount){
     }
     runtimeError("Can only call functions and classes.");
     return false;
+}
+
+ObjUpvalue* captureUpvalue(Value* local){
+    ObjUpvalue* createdUpvalue = newObjUpvalue(local);
+    return createdUpvalue; 
 }

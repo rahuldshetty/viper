@@ -25,6 +25,13 @@ typedef struct{
     int depth;
 } Local;
 
+typedef struct 
+{
+    uint8_t index;
+    bool isLocal;
+} Upvalue;
+
+
 typedef enum {
     TYPE_FUNCTION, // Body of function
     TYPE_SCRIPT, // Top level code is also a function type
@@ -39,6 +46,8 @@ typedef struct {
     Local locals[UINT8_COUNT];
     int localCount;
     int scopeDepth;
+
+    Upvalue upvalues[UINT8_COUNT];
 } Compiler;
 
 // TODO: Ternary Operator
@@ -337,6 +346,42 @@ int resolveLocal(Compiler* compiler, Token* name){
     return -1;
 }
 
+int addUpValue(Compiler* compiler, uint8_t index, bool isLocal){
+    int upvalueCount = compiler->function->upvalueCount;
+
+    for(int i = 0; i < upvalueCount; i++){
+        Upvalue* upvalue = &compiler->upvalues[i];
+        if(upvalue->index == index && upvalue->isLocal == isLocal){
+            return i;
+        }
+    }
+
+    if(upvalueCount == UINT8_COUNT){
+        error("Too many closure variables in function.");
+        return 0;
+    }
+
+    compiler->upvalues[upvalueCount].isLocal = isLocal;
+    compiler->upvalues[upvalueCount].index = index;
+    return compiler->function->upvalueCount++;
+}
+
+int resolveUpValue(Compiler* compiler, Token* name){
+    if(compiler->enclosing == NULL) return -1;
+
+    int local = resolveLocal((Compiler *) compiler->enclosing, name);
+    if(local != -1){
+        return addUpValue(compiler, (uint8_t)local, true);
+    }
+
+    int upvalue = resolveUpValue((Compiler *) compiler->enclosing, name);
+    if(upvalue != -1){
+        return addUpValue(compiler, (uint8_t) upvalue, false);
+    }
+
+    return -1;
+}
+
 void addLocal(Token name){
     // Reach max limit for the local variable array
     if(current->localCount == UINT8_COUNT){
@@ -558,6 +603,11 @@ void function(FunctionType type){
 
     ObjFunction* function = endCompiler();
     emitBytes(OP_CLOSURE, makeConstant(OBJ_VAL(function)));
+
+    for(int i = 0; i < function->upvalueCount; i++){
+        emitByte(compiler.upvalues[i].isLocal ? 1:0);
+        emitByte(compiler.upvalues[i].index);
+    }
 }
 
 // Argument processing for function call
@@ -594,6 +644,9 @@ void namedVariable(Token name, bool canAssign){
     if(arg != -1){
         getOp = OP_GET_LOCAL;
         setOp = OP_SET_LOCAL;
+    } else if((arg = resolveUpValue(current, &name)) != -1){
+        getOp = OP_GET_UPVALUE;
+        setOp = OP_SET_UPVALUE;
     } else {
         arg = identifierConstant(&name);
         getOp = OP_GET_GLOBAL;
