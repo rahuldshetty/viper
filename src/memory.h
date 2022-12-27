@@ -2,6 +2,9 @@
 #define viper_memory_h
 
 #include "common.h"
+#include "compiler.h"
+#include "object.h"
+#include "vm.h"
 
 #define ALLOCATE(type, count) \
     (type*)reallocate(NULL, 0, sizeof(type)*(count))
@@ -20,5 +23,7 @@
 
 void* reallocate(void* pointer, size_t oldSize, size_t newSize);
 void freeObjects();
+void collectGarbage();
+void markObject(Obj* object);
 
 #endif

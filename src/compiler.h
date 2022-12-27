@@ -32,4 +32,6 @@ void or_(bool);
 
 void synchronize();
 
+void markCompilerRoots();
+
 #endif

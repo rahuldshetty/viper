@@ -5,6 +5,7 @@
 #include "chunk.h"
 #include "common.h"
 #include "compiler.h"
+#include "memory.h"
 #include "scanner.h"
 #include "token.h"
 #include "value.h"
@@ -917,4 +918,12 @@ void ifStatement(){
     if(match_parser(TOKEN_ELSE)) statement();
     patchJump(elseJump);
     
+}
+
+void markCompilerRoots(){
+    Compiler* compiler = current;
+    while(compiler != NULL){
+        markObject((Obj*)compiler->function);
+        compiler = (Compiler *)(compiler->enclosing);
+    }
 }

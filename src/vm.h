@@ -1,10 +1,11 @@
 #ifndef viper_vm_h
 #define viper_vm_h
 
+#include <stdlib.h>
+
 #include "object.h"
 #include "table.h"
 #include "value.h"
-
 
 #define FRAMES_MAX 64
 #define STACK_MAX ( FRAMES_MAX * UINT8_COUNT )
@@ -26,6 +27,14 @@ typedef struct {
     Table strings;
     struct ObjUpvalue* openUpvalues;
     Obj* objects;
+
+    size_t bytesAllocated; // current allocated bytes in heap
+    size_t nextGC; // threshold to trigger GC
+
+    /* Garbage Collector */
+    int grayCount;
+    int grayCapacity;
+    Obj** grayStack;
 } VM;
 
 VM vm;
