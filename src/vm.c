@@ -408,6 +408,12 @@ bool callValue(Value callee, int argCount){
                 return callFn(AS_CLOSURE(callee), argCount);
             }
 
+            case OBJ_CLASS:{
+                ObjClass* kclass = AS_CLASS(callee);
+                vm.stackTop[-argCount - 1] = OBJ_VAL(newInstance(kclass));
+                return true;
+            }
+
             default:
                 break;
         }

@@ -41,6 +41,12 @@ void freeObject(Obj* object){
 
 
     switch (object->type){
+        case OBJ_INSTANCE:{
+            ObjInstance* instance = (ObjInstance*) object;
+            freeTable(&instance->fields);
+            FREE(ObjInstance, object);
+            break;
+        }
 
         case OBJ_CLASS:{
             FREE(ObjClass, object);
@@ -200,6 +206,13 @@ void blackendObject(Obj* object){
         case OBJ_CLASS:{
             ObjClass* kclass = (ObjClass*) object;
             markObject((Obj*)kclass);
+            break;
+        }
+
+        case OBJ_INSTANCE:{
+            ObjInstance* instance = (ObjInstance*) object;
+            markObject((Obj*) instance->kclass);
+            markTable(&instance->fields);
             break;
         }
 
