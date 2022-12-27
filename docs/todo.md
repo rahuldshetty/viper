@@ -91,7 +91,23 @@ Define an addition “method” that adds two vectors and produces a third.
 
 25) Mark-sweep is only one of a variety of garbage collection algorithms out there. Explore those by replacing or augmenting the current collector with another one. Good candidates to consider are reference counting, Cheney’s algorithm, or the Lisp 2 mark-compact algorithm.
 
-26) 
+26) BUG: File compilation requires end of file new-line to run. 
+
+27) Trying to access a non-existent field on an object immediately aborts the entire VM. The user has no way to recover from this runtime error, nor is there any way to see if a field exists before trying to access it. It’s up to the user to ensure on their own that only valid fields are read.
+
+How do other dynamically typed languages handle missing fields? What do you think Lox should do? Implement your solution.
+
+28) Fields are accessed at runtime by their string name. But that name must always appear directly in the source code as an identifier token. A user program cannot imperatively build a string value and then use that as the name of a field. Do you think they should be able to? Devise a language feature that enables that and implement it.
+
+29) Conversely, Lox offers no way to remove a field from an instance. You can set a field’s value to nil, but the entry in the hash table is still there. How do other languages handle this? Choose and implement a strategy for Lox.
+
+30) Because fields are accessed by name at runtime, working with instance state is slow. It’s technically a constant-time operation—thanks, hash tables—but the constant factors are relatively large. This is a major component of why dynamic languages are slower than statically typed ones.
+
+How do sophisticated implementations of dynamically typed languages cope with and optimize this?
+
+31) 
+
+
 
 
 

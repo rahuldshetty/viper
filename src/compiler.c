@@ -95,7 +95,7 @@ ParseRule rules[] = {
   [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
   [TOKEN_RIGHT_BRACE]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_COMMA]         = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_DOT]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_DOT]           = {NULL,     dot,    PREC_CALL},
   [TOKEN_MINUS]         = {unary,    binary, PREC_TERM},
   [TOKEN_ADD]           = {NULL,     binary, PREC_TERM},
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
@@ -628,6 +628,18 @@ void classDeclaration(){
 
     consume(TOKEN_LEFT_BRACE, "Expected '{' before class body.");
     consume(TOKEN_RIGHT_BRACE, "Expected '}' after class body.");
+}
+
+void dot(bool canAssign){
+    consume(TOKEN_IDENTIFIER, "Expected property name after dot operator.");
+    uint8_t name = identifierConstant(&parser.previous);
+
+    if(canAssign && match_parser(TOKEN_EQUAL)){
+        expression();
+        emitBytes(OP_SET_PROPERTY, name);
+    } else {
+        emitBytes(OP_GET_PROPERTY, name);
+    }
 }
 
 // Argument processing for function call

@@ -16,6 +16,8 @@ void function();
 
 void classDeclaration();
 
+void dot(bool);
+
 void block();
 void beginScope();
 void endScope();
