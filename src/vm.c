@@ -23,6 +23,7 @@ void initVM(){
 void resetStack(){
     vm.stackTop = vm.stack;
     vm.frameCount = 0;
+    vm.openUpvalues = NULL;
 }
 
 void runtimeError(const char* format, ...){
@@ -258,6 +259,7 @@ InterpretResult run(){
 
             case OP_RETURN: {
                 Value result = pop();
+                closeUpvalues(frame->slots);
                 vm.frameCount--;
                 if(vm.frameCount == 0){
                     pop();
@@ -287,6 +289,12 @@ InterpretResult run(){
 
                 }
                 
+                break;
+            }
+
+            case OP_CLOSE_UPVALUE:{
+                closeUpvalues(vm.stackTop - 1);
+                pop();
                 break;
             }
 
@@ -394,6 +402,34 @@ bool callValue(Value callee, int argCount){
 }
 
 ObjUpvalue* captureUpvalue(Value* local){
+    ObjUpvalue* prevUpvalue = NULL;
+    ObjUpvalue* upvalue = vm.openUpvalues;
+    while(upvalue != NULL && upvalue->location > local){
+        prevUpvalue = upvalue;
+        upvalue = upvalue->next;
+    }
+
+    if(upvalue != NULL && upvalue->location == local){
+        return upvalue;
+    }
+
     ObjUpvalue* createdUpvalue = newObjUpvalue(local);
+    createdUpvalue->next = upvalue;
+
+    if(prevUpvalue == NULL){
+        vm.openUpvalues = createdUpvalue;
+    } else {
+        prevUpvalue->next = createdUpvalue;
+    }
+
     return createdUpvalue; 
+}
+
+void closeUpvalues(Value* last){
+    while(vm.openUpvalues != NULL && vm.openUpvalues->location >= last){
+        ObjUpvalue* upvalue = vm.openUpvalues;
+        upvalue->closed = *upvalue->location;
+        upvalue->location = &upvalue->closed;
+        vm.openUpvalues = upvalue->next;
+    }
 }

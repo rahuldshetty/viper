@@ -24,6 +24,7 @@ typedef struct {
     Value* stackTop;
     Table globals;
     Table strings;
+    struct ObjUpvalue* openUpvalues;
     Obj* objects;
 } VM;
 
@@ -53,5 +54,6 @@ bool callValue(Value callee, int argCount);
 void defineNative(const char* name, NativeFn function);
 
 ObjUpvalue* captureUpvalue(Value* local);
+void closeUpvalues(Value* last);
 
 #endif
