@@ -1,0 +1,2 @@
+class Brioche {}
+print Brioche;

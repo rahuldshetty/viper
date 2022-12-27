@@ -14,6 +14,8 @@ void varDeclaraction();
 void functionDeclaration();
 void function();
 
+void classDeclaration();
+
 void block();
 void beginScope();
 void endScope();

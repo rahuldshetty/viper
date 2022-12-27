@@ -41,6 +41,12 @@ void freeObject(Obj* object){
 
 
     switch (object->type){
+
+        case OBJ_CLASS:{
+            FREE(ObjClass, object);
+            break;
+        }
+
         case OBJ_STRING: {
             ObjString* string = (ObjString*)object;
             FREE_ARRAY(char, string->chars, string->length + 1);
@@ -188,6 +194,12 @@ void blackendObject(Obj* object){
 
         case OBJ_UPVALUE: {
             markValue(((ObjUpvalue*)object)->closed);
+            break;
+        }
+
+        case OBJ_CLASS:{
+            ObjClass* kclass = (ObjClass*) object;
+            markObject((Obj*)kclass);
             break;
         }
 
