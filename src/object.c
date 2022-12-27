@@ -93,6 +93,11 @@ void printObject(Value value){
             break;
         }
 
+        case OBJ_CLOSURE:{
+            printFunction(AS_CLOSURE(value)->function);
+            break;
+        }
+
     }
 }
 
@@ -115,4 +120,9 @@ ObjNative* newNative(NativeFn function){
     ObjNative* native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
     native->function = function;
     return native;
+}
+ObjClosure* newClosure(ObjFunction* function){
+    ObjClosure* closure = ALLOCATE_OBJ(ObjClosure, OBJ_CLOSURE);
+    closure->function = function;
+    return closure;
 }

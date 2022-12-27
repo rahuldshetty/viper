@@ -11,7 +11,7 @@
 
 
 typedef struct{
-    ObjFunction* function;
+    ObjClosure* closure;
     uint8_t* ip;
     Value* slots;
 } CallFrame;
@@ -47,7 +47,7 @@ Value pop();
 Value peek_stack(int distance);
 bool isFalsey(Value value);
 void concatenate();
-bool callFn(ObjFunction* function, int argCount);
+bool callFn(ObjClosure* closure, int argCount);
 bool callValue(Value callee, int argCount);
 
 void defineNative(const char* name, NativeFn function);
