@@ -792,6 +792,10 @@ void returnStatement(){
     }
     
     if(!match_parser(TOKEN_SEMICOLON)){
+        if(current->type == TYPE_INITIALIZER){
+            error("Can't return value from constructor.");
+        }
+
         expression();   
         match_parser(TOKEN_SEMICOLON);
         emitByte(OP_RETURN);
