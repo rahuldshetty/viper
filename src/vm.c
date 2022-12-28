@@ -451,6 +451,16 @@ bool callValue(Value callee, int argCount){
             case OBJ_CLASS:{
                 ObjClass* kclass = AS_CLASS(callee);
                 vm.stackTop[-argCount - 1] = OBJ_VAL(newInstance(kclass));
+
+                // Constructor call handling
+                Value initializer;
+                if(tableGet(&kclass->methods, kclass->name, &initializer)){
+                    return callFn(AS_CLOSURE(initializer), argCount);
+                } else if(argCount != 0){
+                    runtimeError("Expected 0 arguments but got %d.", argCount);
+                    return false;
+                }
+
                 return true;
             }
             

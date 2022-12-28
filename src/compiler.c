@@ -38,6 +38,7 @@ typedef enum {
     TYPE_FUNCTION, // Body of function
     TYPE_METHOD, // function inside class
     TYPE_SCRIPT, // Top level code is also a function type
+    TYPE_INITIALIZER,
 } FunctionType;
 
 typedef struct {
@@ -263,7 +264,12 @@ void emitLoop(int loopStart){
 }
 
 void emitReturn(){
-    emitByte(OP_NULL); // return NULL by default from function calls
+    if(current->type == TYPE_INITIALIZER){
+        emitBytes(OP_GET_LOCAL, 0);
+    } else{
+        emitByte(OP_NULL); // return NULL by default from function calls
+    }
+    
     emitByte(OP_RETURN);
 }
 
@@ -633,12 +639,21 @@ void function(FunctionType type){
 }
 
 // Class Method declaration
-void method(){
+void method(Token* className){
     consume(TOKEN_FUNCTION, "Expected method declaration.");
     consume(TOKEN_IDENTIFIER, "Expected method name.");
     uint8_t constant = identifierConstant(&parser.previous);
 
     FunctionType type = TYPE_METHOD;
+
+    // check if method is initializer
+    if(
+        parser.previous.length == className->length &&
+        memcmp(parser.previous.start, className->start, className->length) == 0
+    ){
+        type = TYPE_INITIALIZER;
+    }
+
     function(type);
 
     emitBytes(OP_METHOD, constant);
@@ -662,7 +677,7 @@ void classDeclaration(){
     consume(TOKEN_LEFT_BRACE, "Expected '{' before class body.");
 
     while(!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)){
-        method();
+        method(&className);
     }
 
     consume(TOKEN_RIGHT_BRACE, "Expected '}' after class body.");
