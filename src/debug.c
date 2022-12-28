@@ -116,6 +116,9 @@ int disassembleInstruction(Chunk* chunk, int offset){
         
         case OP_SET_PROPERTY:
             return constantInstruction("OP_SET_PROPERTY", chunk, offset);
+        
+        case OP_METHOD:
+            return constantInstruction("OP_METHOD", chunk, offset);
 
         case OP_CLOSURE:{
             offset++;

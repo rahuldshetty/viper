@@ -49,6 +49,8 @@ void freeObject(Obj* object){
         }
 
         case OBJ_CLASS:{
+            ObjClass* klass = (ObjClass*) object;
+            freeTable(&klass->methods);
             FREE(ObjClass, object);
             break;
         }
@@ -81,6 +83,11 @@ void freeObject(Obj* object){
 
         case OBJ_UPVALUE:{
             FREE(ObjUpvalue, object);
+            break;
+        }
+
+        case OBJ_BOUND_METHOD:{
+            FREE(ObjBoundMethod, object);
             break;
         }
 
@@ -206,6 +213,7 @@ void blackendObject(Obj* object){
         case OBJ_CLASS:{
             ObjClass* kclass = (ObjClass*) object;
             markObject((Obj*)kclass);
+            markTable(&kclass->methods);
             break;
         }
 
@@ -213,6 +221,13 @@ void blackendObject(Obj* object){
             ObjInstance* instance = (ObjInstance*) object;
             markObject((Obj*) instance->kclass);
             markTable(&instance->fields);
+            break;
+        }
+
+        case OBJ_BOUND_METHOD:{
+            ObjBoundMethod* bound = (ObjBoundMethod*) object;
+            markValue(bound->receiver);
+            markObject((Obj*) bound->method);
             break;
         }
 

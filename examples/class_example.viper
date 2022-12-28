@@ -1,6 +1,14 @@
-class Pair {}
+class Scone {
+  fn topping(first, second) {
+    print "scone with " + first + " and " + second;
+  }
+}
 
-pair = Pair();
-pair.first = 1;
-pair.second = 2;
-print pair.first + pair.second;
+scone = Scone();
+
+print Scone
+print scone
+print scone.topping
+
+scone.topping("berries", "cream");
+

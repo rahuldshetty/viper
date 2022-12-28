@@ -88,6 +88,7 @@ void variable(bool canAssign);
 void literal(bool canAssign);
 void string_constant(bool canAssign);
 void call(bool);
+void namedVariable(Token name, bool canAssign);
 
 ParseRule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
@@ -617,17 +618,37 @@ void function(FunctionType type){
     }
 }
 
+// Class Method declaration
+void method(){
+    consume(TOKEN_FUNCTION, "Expected method declaration.");
+    consume(TOKEN_IDENTIFIER, "Expected method name.");
+    uint8_t constant = identifierConstant(&parser.previous);
+
+    FunctionType type = TYPE_FUNCTION;
+    function(type);
+
+    emitBytes(OP_METHOD, constant);
+}
+
 // Class Declaration
 void classDeclaration(){
     consume(TOKEN_IDENTIFIER, "Expected class name.");
-    uint8_t nameConstant = identifierConstant(&parser.previous);
+    Token className = parser.previous;
+    uint8_t nameConstant = identifierConstant(&className);
     declareVariable();
 
     emitBytes(OP_CLASS, nameConstant);
     defineVariable(nameConstant);
 
+    namedVariable(className, false); // insert class name at top of stack
     consume(TOKEN_LEFT_BRACE, "Expected '{' before class body.");
+
+    while(!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)){
+        method();
+    }
+
     consume(TOKEN_RIGHT_BRACE, "Expected '}' after class body.");
+    emitByte(OP_POP); // remove class name from top of stack
 }
 
 void dot(bool canAssign){

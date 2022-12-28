@@ -326,8 +326,10 @@ InterpretResult run(){
                     break;
                 }
                 
-                runtimeError("Undefined property '%s'.", name->chars);
-                return INTERPRET_RUNTIME_ERROR;
+                if(!bindMethod(instance->kclass, name)){
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
             }
 
             case OP_SET_PROPERTY:{
@@ -342,6 +344,11 @@ InterpretResult run(){
                 pop();
                 push(value);
                 break;             
+            }
+
+            case OP_METHOD:{
+                defineMethod(READ_STRING());
+                break;
             }
 
         }
@@ -446,6 +453,11 @@ bool callValue(Value callee, int argCount){
                 vm.stackTop[-argCount - 1] = OBJ_VAL(newInstance(kclass));
                 return true;
             }
+            
+            case OBJ_BOUND_METHOD:{
+                ObjBoundMethod* bound = AS_BOUND_METHOD(callee);
+                return callFn(bound->method, argCount);
+            }
 
             default:
                 break;
@@ -486,4 +498,26 @@ void closeUpvalues(Value* last){
         upvalue->location = &upvalue->closed;
         vm.openUpvalues = upvalue->next;
     }
+}
+
+void defineMethod(ObjString* name){
+    Value method = peek_stack(0); // closure
+    ObjClass* klass = AS_CLASS(peek_stack(1)); 
+    tableSet(&klass->methods, name, method);
+    pop(); // pop closure
+}
+
+
+bool bindMethod(ObjClass* klass, ObjString* name){
+    Value method;
+    if(!tableGet(&klass->methods, name, &method)){
+        runtimeError("Undefined property '%s'.", name->chars);
+        return false;
+    }
+
+    ObjBoundMethod* bound = newBoundMethod(peek_stack(0), AS_CLOSURE(method));
+
+    pop();
+    push(OBJ_VAL(bound));
+    return true;
 }

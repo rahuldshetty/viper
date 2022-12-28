@@ -64,5 +64,7 @@ void defineNative(const char* name, NativeFn function);
 
 ObjUpvalue* captureUpvalue(Value* local);
 void closeUpvalues(Value* last);
+void defineMethod(ObjString* name);
+bool bindMethod(ObjClass* klass, ObjString* name);
 
 #endif
