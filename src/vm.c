@@ -388,6 +388,19 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_SUPER_INVOKE:{
+                ObjString* method = READ_STRING();
+                int argCount = READ_BYTE();
+                ObjClass* superclass = AS_CLASS(pop());
+
+                if(!invokeFromClass(superclass, method, argCount)){
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                frame = &vm.frames[vm.frameCount - 1];
+                break;
+            }
+
         }
     }
     #undef READ_STRING

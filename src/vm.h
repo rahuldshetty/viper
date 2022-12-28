@@ -67,5 +67,6 @@ void closeUpvalues(Value* last);
 void defineMethod(ObjString* name);
 bool bindMethod(ObjClass* klass, ObjString* name);
 bool invoke(ObjString* name, int argCount);
+bool invokeFromClass(ObjClass* klass, ObjString* name, int argCount);
 
 #endif
