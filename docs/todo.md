@@ -105,9 +105,14 @@ How do other dynamically typed languages handle missing fields? What do you thin
 
 How do sophisticated implementations of dynamically typed languages cope with and optimize this?
 
-31) 
+31) A tenet of object-oriented programming is that a class should ensure new objects are in a valid state. In Lox, that means defining an initializer that populates the instance’s fields. Inheritance complicates invariants because the instance must be in a valid state according to all of the classes in the object’s inheritance chain.
 
+The easy part is remembering to call super.init() in each subclass’s init() method. The harder part is fields. There is nothing preventing two classes in the inheritance chain from accidentally claiming the same field name. When this happens, they will step on each other’s fields and possibly leave you with an instance in a broken state.
 
+If Lox was your language, how would you address this, if at all? If you would change the language, implement your change.
 
+32) Our copy-down inheritance optimization is valid only because Lox does not permit you to modify a class’s methods after its declaration. This means we don’t have to worry about the copied methods in the subclass getting out of sync with later changes to the superclass.
 
+Other languages, like Ruby, do allow classes to be modified after the fact. How do implementations of languages like that support class modification while keeping method resolution efficient?
 
+33) 
