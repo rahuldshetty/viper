@@ -36,6 +36,7 @@ typedef struct
 
 typedef enum {
     TYPE_FUNCTION, // Body of function
+    TYPE_METHOD, // function inside class
     TYPE_SCRIPT, // Top level code is also a function type
 } FunctionType;
 
@@ -51,6 +52,10 @@ typedef struct {
 
     Upvalue upvalues[UINT8_COUNT];
 } Compiler;
+
+typedef struct{
+    struct ClassCompiler* enclosing;
+} ClassCompiler;
 
 // TODO: Ternary Operator
 
@@ -89,6 +94,7 @@ void literal(bool canAssign);
 void string_constant(bool canAssign);
 void call(bool);
 void namedVariable(Token name, bool canAssign);
+void this_(bool);
 
 ParseRule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
@@ -125,7 +131,7 @@ ParseRule rules[] = {
   [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_THIS]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_THIS]          = {this_,    NULL,   PREC_NONE},
   [TOKEN_TRUE]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
@@ -135,6 +141,7 @@ ParseRule rules[] = {
 
 Parser parser;
 Compiler* current = NULL; // TODO: multiple compilers running in parallel
+ClassCompiler* currentClass = NULL;
 
 Chunk* currentChunk(){
     return &(current->function->chunk);
@@ -160,8 +167,15 @@ void initCompiler(Compiler* compiler, FunctionType type){
     Local* local = &current->locals[current->localCount++];
     local->depth = 0;
     local->isCaptured = false;
-    local->name.start = "";
-    local->name.length = 0;
+
+    // Store this keyword for class object
+    if(type != TYPE_FUNCTION){
+        local->name.start = "this";
+        local->name.length = 4;
+    } else{
+        local->name.start = "";
+        local->name.length = 0;
+    }
 }
 
 void errorAt(Token* token, const char* message){
@@ -624,7 +638,7 @@ void method(){
     consume(TOKEN_IDENTIFIER, "Expected method name.");
     uint8_t constant = identifierConstant(&parser.previous);
 
-    FunctionType type = TYPE_FUNCTION;
+    FunctionType type = TYPE_METHOD;
     function(type);
 
     emitBytes(OP_METHOD, constant);
@@ -640,6 +654,10 @@ void classDeclaration(){
     emitBytes(OP_CLASS, nameConstant);
     defineVariable(nameConstant);
 
+    ClassCompiler classCompiler;
+    classCompiler.enclosing = (struct ClassCompiler*) currentClass;
+    currentClass = &classCompiler;
+
     namedVariable(className, false); // insert class name at top of stack
     consume(TOKEN_LEFT_BRACE, "Expected '{' before class body.");
 
@@ -649,6 +667,8 @@ void classDeclaration(){
 
     consume(TOKEN_RIGHT_BRACE, "Expected '}' after class body.");
     emitByte(OP_POP); // remove class name from top of stack
+
+    currentClass = (ClassCompiler*) currentClass->enclosing;
 }
 
 void dot(bool canAssign){
@@ -975,4 +995,13 @@ void markCompilerRoots(){
         markObject((Obj*)compiler->function);
         compiler = (Compiler *)(compiler->enclosing);
     }
+}
+
+void this_(bool canAssign){
+    if(currentClass == NULL){
+        error("Can't use 'this' outside of a class.");
+        return;
+    }
+
+    variable(false);
 }
