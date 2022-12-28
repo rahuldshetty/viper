@@ -95,6 +95,7 @@ void literal(bool canAssign);
 void string_constant(bool canAssign);
 void call(bool);
 void namedVariable(Token name, bool canAssign);
+uint8_t argumentList();
 void this_(bool);
 
 ParseRule rules[] = {
@@ -693,6 +694,11 @@ void dot(bool canAssign){
     if(canAssign && match_parser(TOKEN_EQUAL)){
         expression();
         emitBytes(OP_SET_PROPERTY, name);
+    } else if(match_parser(TOKEN_LEFT_PAREN)){
+        // method invocation
+        uint8_t argCount = argumentList();
+        emitBytes(OP_INVOKE, name);
+        emitByte(argCount);
     } else {
         emitBytes(OP_GET_PROPERTY, name);
     }

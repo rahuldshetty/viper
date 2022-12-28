@@ -40,6 +40,7 @@ typedef enum {
     OP_SET_PROPERTY,
     OP_GET_PROPERTY,
     OP_METHOD,
+    OP_INVOKE,
 } OpCode;
 
 
