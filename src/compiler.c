@@ -56,6 +56,7 @@ typedef struct {
 
 typedef struct{
     struct ClassCompiler* enclosing;
+    bool hasSuperclass;
 } ClassCompiler;
 
 // TODO: Ternary Operator
@@ -97,6 +98,7 @@ void call(bool);
 void namedVariable(Token name, bool canAssign);
 uint8_t argumentList();
 void this_(bool);
+void super_(bool);
 
 ParseRule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
@@ -132,7 +134,7 @@ ParseRule rules[] = {
   [TOKEN_OR]            = {NULL,     or_,    PREC_OR},
   [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_SUPER]         = {super_,   NULL,   PREC_NONE},
   [TOKEN_THIS]          = {this_,    NULL,   PREC_NONE},
   [TOKEN_TRUE]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
@@ -660,6 +662,13 @@ void method(Token* className){
     emitBytes(OP_METHOD, constant);
 }
 
+Token syntheticToken(const char* text){
+    Token token;
+    token.start = text;
+    token.length = (int)strlen(text);
+    return token;
+}
+
 // Class Declaration
 void classDeclaration(){
     consume(TOKEN_IDENTIFIER, "Expected class name.");
@@ -671,8 +680,30 @@ void classDeclaration(){
     defineVariable(nameConstant);
 
     ClassCompiler classCompiler;
+    classCompiler.hasSuperclass = false;
     classCompiler.enclosing = (struct ClassCompiler*) currentClass;
     currentClass = &classCompiler;
+
+    // Accept Parent class for inheritence
+    if(match_parser(TOKEN_LEFT_PAREN)){
+        consume(TOKEN_IDENTIFIER, "Expected superclass name.");
+        
+        variable(false);
+
+        if(identifiersEqual(&className, &parser.previous)){
+            error("A class cannot inherit from itself.");
+        }
+
+        beginScope();
+        addLocal(syntheticToken("super"));
+        defineVariable(0);
+
+        namedVariable(className, false);
+        
+        consume(TOKEN_RIGHT_PAREN, "Expected ')' after superclass name.");
+        emitByte(OP_INHERIT);
+        classCompiler.hasSuperclass = true;
+    }
 
     namedVariable(className, false); // insert class name at top of stack
     consume(TOKEN_LEFT_BRACE, "Expected '{' before class body.");
@@ -683,6 +714,10 @@ void classDeclaration(){
 
     consume(TOKEN_RIGHT_BRACE, "Expected '}' after class body.");
     emitByte(OP_POP); // remove class name from top of stack
+
+    if(classCompiler.hasSuperclass){
+        endScope();
+    }
 
     currentClass = (ClassCompiler*) currentClass->enclosing;
 }
@@ -1029,4 +1064,19 @@ void this_(bool canAssign){
     }
 
     variable(false);
+}
+
+void super_(bool canAssign){
+    if(currentClass == NULL){
+        error("Can't use 'super' outside of a class.");
+    } else if(!currentClass->hasSuperclass) {
+        error("Can't use 'super' in a class with no superclass.");
+    }
+    consume(TOKEN_DOT, "Expected dot operator after 'super'.");
+    consume(TOKEN_IDENTIFIER, "Expected superclass method name.");
+    uint8_t name = identifierConstant(&parser.previous);
+
+    namedVariable(syntheticToken("this"), false);
+    namedVariable(syntheticToken("super"), false);
+    emitBytes(OP_GET_SUPER, name);
 }

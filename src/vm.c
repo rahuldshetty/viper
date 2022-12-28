@@ -361,6 +361,33 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_INHERIT:{
+                Value superclass = peek_stack(1);
+                if(!IS_CLASS(superclass)){
+                    runtimeError("Superclass must be a class.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                ObjClass* subclass = AS_CLASS(peek_stack(0));
+
+                tableAddAll(
+                    &AS_CLASS(superclass)->methods,
+                    &subclass->methods
+                );
+                pop();
+                break;
+            }
+
+            case OP_GET_SUPER:{
+                ObjString* name = READ_STRING();
+                ObjClass* superclass = AS_CLASS(pop());
+
+                if(!bindMethod(superclass, name)){
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+            }
+
         }
     }
     #undef READ_STRING
