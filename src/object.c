@@ -131,6 +131,7 @@ void printObject(Value value){
             printf("[");
             
             int total = list->array.count;
+
             for(int i = total-1; i >= 0; i--){
                 printValue(list->array.values[i]);
                 if(i != 0){

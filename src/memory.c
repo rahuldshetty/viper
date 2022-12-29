@@ -231,6 +231,12 @@ void blackendObject(Obj* object){
             break;
         }
 
+        case OBJ_LIST:{
+            ObjList* list = (ObjList*) object;
+            markArray(&list->array);
+            break;
+        }
+
         case OBJ_NATIVE:
         case OBJ_STRING:
             break;

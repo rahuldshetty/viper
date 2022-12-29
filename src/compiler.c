@@ -756,7 +756,8 @@ uint8_t argumentList(TokenType endToken){
     if(!check(endToken)){
         do{
             expression();
-            if(argCount==255){
+            // Make check for non list objects
+            if(endToken != TOKEN_RIGHT_BRACKET && argCount==255){
                 error("Can't have more than 255 arguments.");
             }
             argCount++;
