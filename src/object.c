@@ -126,6 +126,22 @@ void printObject(Value value){
             break;
         }
 
+        case OBJ_LIST:{
+            ObjList* list = AS_LIST(value);
+            printf("[");
+            
+            int total = list->array.count;
+            for(int i = total-1; i >= 0; i--){
+                printValue(list->array.values[i]);
+                if(i != 0){
+                    printf(", ");
+                }
+            }
+
+            printf("]");
+            break;
+        }
+
     }
 }
 
@@ -195,4 +211,10 @@ ObjBoundMethod* newBoundMethod(Value receiver, ObjClosure* method){
     bound->method = method;
 
     return bound;
+}
+
+ObjList* newList(){
+    ObjList* list = ALLOCATE_OBJ(ObjList, OBJ_LIST);
+    initValueArray(&list->array);
+    return list;
 }

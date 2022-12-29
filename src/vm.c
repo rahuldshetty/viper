@@ -265,6 +265,16 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_LIST:{
+                int itemCount = READ_BYTE();
+                ObjList* list = newList();
+                for(int i=0; i < itemCount; i++){
+                    writeValueArray(&list->array, pop());
+                }
+                push(OBJ_VAL(list));
+                break;
+            }
+
             case OP_RETURN: {
                 Value result = pop();
                 closeUpvalues(frame->slots);

@@ -72,6 +72,7 @@ typedef enum {
   PREC_FACTOR,      // * /
   PREC_UNARY,       // ! -
   PREC_CALL,        // . ()
+  PREC_INDEX,       // array[INDEX], map[INDEX]
   PREC_PRIMARY
 } Precedence;
 
@@ -93,14 +94,17 @@ void grouping(bool canAssign);
 void binary(bool canAssign);
 void variable(bool canAssign);
 void literal(bool canAssign);
+void list_literal(bool);
 void string_constant(bool canAssign);
 void call(bool);
 void namedVariable(Token name, bool canAssign);
-uint8_t argumentList();
+uint8_t argumentList(TokenType);
 void this_(bool);
 void super_(bool);
 
 ParseRule rules[] = {
+  [TOKEN_LEFT_BRACKET]  = {list_literal,     NULL,   PREC_INDEX},
+  [TOKEN_RIGHT_BRACKET] = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
@@ -502,6 +506,12 @@ void literal(bool canAssign){
     }
 }
 
+// List Literal
+void list_literal(bool canAssign){
+    uint8_t itemCount = argumentList(TOKEN_RIGHT_BRACKET);
+    emitBytes(OP_LIST, itemCount);
+}
+
 // List of handler for tokens
 void number_constant(bool canAssign){
     double value = strtod(parser.previous.start, NULL);
@@ -731,7 +741,7 @@ void dot(bool canAssign){
         emitBytes(OP_SET_PROPERTY, name);
     } else if(match_parser(TOKEN_LEFT_PAREN)){
         // method invocation
-        uint8_t argCount = argumentList();
+        uint8_t argCount = argumentList(TOKEN_RIGHT_PAREN);
         emitBytes(OP_INVOKE, name);
         emitByte(argCount);
     } else {
@@ -740,10 +750,10 @@ void dot(bool canAssign){
 }
 
 // Argument processing for function call
-uint8_t argumentList(){
+uint8_t argumentList(TokenType endToken){
     uint8_t argCount = 0;
 
-    if(!check(TOKEN_RIGHT_PAREN)){
+    if(!check(endToken)){
         do{
             expression();
             if(argCount==255){
@@ -753,13 +763,13 @@ uint8_t argumentList(){
         } while(match_parser(TOKEN_COMMA));
     }
 
-    consume(TOKEN_RIGHT_PAREN, "Expected ')' afer arguments.");
+    consume(endToken, "Expected ')' afer arguments.");
     return argCount;
 }
 
 // Function Call
 void call(bool canAsign){
-    uint8_t argCount = argumentList();
+    uint8_t argCount = argumentList(TOKEN_RIGHT_PAREN);
     emitBytes(OP_CALL, argCount);
 }
 
@@ -1079,7 +1089,7 @@ void super_(bool canAssign){
     namedVariable(syntheticToken("this"), false);
 
     if(match_parser(TOKEN_LEFT_PAREN)){
-        uint8_t argCount = argumentList();
+        uint8_t argCount = argumentList(TOKEN_RIGHT_PAREN);
         namedVariable(syntheticToken("super"), false);
         emitBytes(OP_SUPER_INVOKE, name);
         emitByte(argCount);

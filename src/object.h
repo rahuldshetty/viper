@@ -15,6 +15,7 @@
 #define IS_CLASS(value) isObjType(value, OBJ_CLASS)
 #define IS_INSTANCE(value) isObjType(value, OBJ_INSTANCE)
 #define IS_BOUND_METHOD(value) isObjType(value, OBJ_BOUND_METHOD)
+#define IS_LIST(value) isObjType(value, OBJ_LIST)
 
 #define AS_STRING(value) (((ObjString*)AS_OBJ(value)))
 #define AS_CSTRING(value) (((ObjString*)AS_OBJ(value))->chars)
@@ -24,6 +25,7 @@
 #define AS_CLASS(value) ((ObjClass*)AS_OBJ(value))
 #define AS_INSTANCE(value) ((ObjInstance*)AS_OBJ(value))
 #define AS_BOUND_METHOD(value) ((ObjBoundMethod*)AS_OBJ(value))
+#define AS_LIST(value) ((ObjList*)AS_OBJ(value))
 
 typedef enum {
     OBJ_STRING,
@@ -33,6 +35,7 @@ typedef enum {
     OBJ_CLASS,
     OBJ_INSTANCE,
     OBJ_BOUND_METHOD,
+    OBJ_LIST,
 } ObjType;
 
 struct Obj {
@@ -88,6 +91,11 @@ typedef struct {
     ObjClosure* method;
 } ObjBoundMethod;
 
+typedef struct{
+    Obj obj;
+    ValueArray array;
+} ObjList;
+
 typedef Value (*NativeFn)(int argCount, Value* args);
 
 typedef struct{
@@ -109,5 +117,6 @@ ObjUpvalue* newObjUpvalue(Value* slot);
 ObjClass* newClass(ObjString* name);
 ObjInstance* newInstance(ObjClass* klass);
 ObjBoundMethod* newBoundMethod(Value receiver, ObjClosure* method);
+ObjList* newList();
 
 #endif
