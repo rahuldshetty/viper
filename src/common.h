@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define NAN_BOXING
 #define DEBUG_PRINT_CODE
 #define DEBUG_TRACE_EXECUTION
 
@@ -20,5 +21,8 @@
 
 #undef DEBUG_STRESS_GC
 #undef DEBUG_LOG_GC
+
+// Uncomment to remove support for NaN Boxing
+// #undef NAN_BOXING
 
 #endif
