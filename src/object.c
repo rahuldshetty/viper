@@ -148,19 +148,21 @@ void printObject(Value value){
             ObjMap* map = AS_MAP(value);
             printf("{");
 
-            int total = map->count;
+            int total = map->capacity;
+            int count = map->count;
 
             for(int i = 0; i < total; i++){
                 MapEntry* entry = &map->entries[i];
 
-                // printf("ADDRESS:%x\n", entry);
+                if(!IS_NULL(entry->key)){
+                    printValue(entry->key);
+                    printf(": ");
+                    printValue(entry->value);
+                    count--;
 
-                printValue(entry->key);
-                printf(": ");
-                printValue(entry->value);
-
-                if(i != total - 1){
-                    printf(", ");
+                    if(count != 0){
+                        printf(", ");
+                    }
                 }
             }
 

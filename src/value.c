@@ -79,7 +79,6 @@ uint32_t hashBits(double hash)
 uint32_t hashObject(Obj* obj){
     switch(obj->type){
         case OBJ_STRING:
-            printf("Hash: %u ", ((ObjString*) obj)->hash);
             return ((ObjString*) obj)->hash;
 
         default:

@@ -17,24 +17,25 @@ void freeMap(ObjMap* map){
     initMap(map);
 }
 
-uint32_t findMapEntry(MapEntry* entries, int capacity, Value key, int count){
-    // uint32_t index = key->hash % capacity;
-    // Faster modulo calculation
-    // A Mod B = A & (B-1), when B is power of 2
+MapEntry* findMapEntry(MapEntry* entries, int capacity, Value key){
+    uint32_t index = hashValue(key) % capacity;
 
-    // TODO: FIX HARDCODING OF HASH VALUES
-    //  print {"h": 1, "hello": 2, 4:4}
-    uint32_t index = 0;
-    
-    // if(count==0) index = 0;
-    // else index = hashValue(key) % capacity;
+    MapEntry* tombstone = NULL;
 
     for(;;){
         MapEntry* entry = &entries[index];
 
-        if(IS_NULL(entry->key) || valuesEqual(entry->key, key)){
-            // printf("INDEX: %u\n", index);
-            return index;
+        if(IS_NULL(entry->key)){
+            if(IS_NULL(entry->value)){
+                // Empty entry
+                return tombstone != NULL ? tombstone : entry;
+            } else {
+                // found tombstone
+                if (tombstone == NULL) tombstone = entry;
+            }
+        } else if (valuesEqual(entry->key, key)){
+            // found key
+            return entry;
         }
 
         index = (index + 1) % capacity;
@@ -53,8 +54,7 @@ void adjustMapCapacity(ObjMap* map, int capacity){
         MapEntry* entry = &map->entries[i];
 
         if(IS_NULL(entry->key)) continue;
-        uint32_t index = findMapEntry(entries, capacity, entry->key, map->count);
-        MapEntry* dest = &map->entries[index];
+        MapEntry* dest = findMapEntry(entries, capacity, entry->key);
         dest->key = entry->key;
         dest->value = entry->value;
         map->count++;
@@ -74,13 +74,11 @@ bool mapSet(ObjMap* map, Value key, Value value){
         adjustMapCapacity(map, capacity);
     }
 
-    uint32_t index = findMapEntry(map->entries, map->capacity, key, map->count);
-    MapEntry* entry = &map->entries[index];
+    MapEntry* entry  = findMapEntry(map->entries, map->capacity, key);
     bool isNewKey = IS_NULL(entry->key);
 
     if(isNewKey && IS_NULL(entry->value)) map->count++;
 
-    // printf("ADDRESS:%x\n", entry);
     entry->key = key;
     entry->value = value;
 
@@ -90,8 +88,7 @@ bool mapSet(ObjMap* map, Value key, Value value){
 bool mapGet(ObjMap* map, Value key, Value* value){
     if(map->count == 0) return false;
 
-    uint32_t index = findMapEntry(map->entries, map->capacity, key, map->count);
-    MapEntry* entry = &map->entries[index];
+    MapEntry* entry = findMapEntry(map->entries, map->capacity, key);
     if(IS_NULL(entry->key)) return false;
 
     *value =entry->value;
@@ -111,8 +108,7 @@ bool mapDelete(ObjMap* map, Value key){
     if(map->count == 0) return false;
 
     //Find entry
-    uint32_t index = findMapEntry(map->entries, map->capacity, key, map->count);
-    MapEntry* entry = &map->entries[index];
+    MapEntry* entry = findMapEntry(map->entries, map->capacity, key);
     if(IS_NULL(entry->key)) return false;
 
     // Place tombstone in the entry field
