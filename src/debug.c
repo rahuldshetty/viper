@@ -108,6 +108,9 @@ int disassembleInstruction(Chunk* chunk, int offset){
         case OP_LIST:
             return byteInstruction("OP_LIST", chunk, offset);
 
+        case OP_MAP:
+            return byteInstruction("OP_MAP", chunk, offset);
+
         case OP_CLOSE_UPVALUE:
             return simpleInstruction("OP_CLOSE_UPVALUE", offset);
 

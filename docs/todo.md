@@ -115,4 +115,6 @@ If Lox was your language, how would you address this, if at all? If you would ch
 
 Other languages, like Ruby, do allow classes to be modified after the fact. How do implementations of languages like that support class modification while keeping method resolution efficient?
 
-33) 
+33) TODO: FIX HARDCODING OF HASH VALUES in MAP
+
+34) 

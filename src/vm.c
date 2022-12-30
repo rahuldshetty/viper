@@ -6,6 +6,7 @@
 #include "common.h"
 #include "compiler.h"
 #include "debug.h"
+#include "map.h"
 #include "memory.h"
 #include "object.h"
 #include "value.h"
@@ -272,6 +273,30 @@ InterpretResult run(){
                     writeValueArray(&list->array, pop());
                 }
                 push(OBJ_VAL(list));
+                break;
+            }
+
+            case OP_MAP:{
+                int itemCounts = READ_BYTE();                
+                ObjMap* map = newMap();
+
+                for(int i = itemCounts - 1; i >= 0; i = i - 1){
+                    // Check item type of key
+                    if(!IS_STRING(peek_stack(2*i + 1)) && !IS_NUMBER(peek_stack(2*i + 1))){
+                        runtimeError("Map keys must be string or number type.");
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+
+                    Value value = peek_stack(2*i);
+                    Value key = peek_stack(2*i + 1);
+
+                    mapSet(map, key, value);
+                }
+
+                // remove elements from top of stack
+                vm.stackTop -= 2 * itemCounts;
+
+                push(OBJ_VAL(map));
                 break;
             }
 

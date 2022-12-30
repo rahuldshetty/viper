@@ -98,4 +98,6 @@ void freeValueArray(ValueArray* array);
 void printValue(Value value);
 bool valuesEqual(Value a, Value b);
 
+uint32_t hashValue(Value);
+
 #endif

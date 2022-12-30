@@ -95,6 +95,7 @@ void binary(bool canAssign);
 void variable(bool canAssign);
 void literal(bool canAssign);
 void list_literal(bool);
+void map_literal(bool);
 void string_constant(bool canAssign);
 void call(bool);
 void namedVariable(Token name, bool canAssign);
@@ -107,7 +108,7 @@ ParseRule rules[] = {
   [TOKEN_RIGHT_BRACKET] = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
+  [TOKEN_LEFT_BRACE]    = {map_literal,     NULL,   PREC_NONE}, 
   [TOKEN_RIGHT_BRACE]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_COMMA]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_DOT]           = {NULL,     dot,    PREC_CALL},
@@ -510,6 +511,30 @@ void literal(bool canAssign){
 void list_literal(bool canAssign){
     uint8_t itemCount = argumentList(TOKEN_RIGHT_BRACKET);
     emitBytes(OP_LIST, itemCount);
+}
+
+// Map/Hash Object
+void map_literal(bool canAssign){
+    uint8_t itemCount = 0;
+    do{
+        if(check(TOKEN_RIGHT_BRACE)){
+            break;
+        }
+
+        expression();
+        
+        consume(TOKEN_COLON, "Expected ':' after Map key.");
+
+        expression();
+
+        itemCount++;
+
+    } while(match_parser(TOKEN_COMMA));
+    
+    emitBytes(OP_MAP, itemCount);
+    
+    consume(TOKEN_RIGHT_BRACE, "Expected '}' after Map body.");
+    match_parser(TOKEN_SEMICOLON);
 }
 
 // List of handler for tokens

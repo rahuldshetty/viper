@@ -69,3 +69,47 @@ bool valuesEqual(Value a, Value b){
     }
 #endif
 }
+
+// Hack for Hash function
+uint32_t hashBits(double hash)
+{
+    return (int) hash;
+}
+
+uint32_t hashObject(Obj* obj){
+    switch(obj->type){
+        case OBJ_STRING:
+            printf("Hash: %u ", ((ObjString*) obj)->hash);
+            return ((ObjString*) obj)->hash;
+
+        default:
+            return 0;
+    }
+}
+
+uint32_t hashNumber(double num){
+    return hashBits(num);
+}
+
+uint32_t hashValue(Value value){
+#ifdef NAN_BOXING
+    if(IS_OBJ(value)){
+        return hashObject(AS_OBJ(value));
+    } else if(IS_NUMBER(value)){
+        return hashBits(AS_NUMBER(value));
+    }
+
+    return 0;
+
+#else 
+    switch (value.type)
+    {
+        case VAL_BOOL:  return (uint32_t) AS_BOOL(value);
+        case VAL_NULL:  return 2;
+        case VAL_NUMBER:   return hashNumber(AS_NUMBER(value));
+        case VAL_OBJ:   return hashObject(AS_OBJ(value));
+    }
+    
+    return 0;
+#endif
+}

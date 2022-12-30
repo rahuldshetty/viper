@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "memory.h"
+#include "map.h"
 #include "object.h"
 #include "table.h"
 #include "value.h"
@@ -143,6 +144,30 @@ void printObject(Value value){
             break;
         }
 
+        case OBJ_MAP:{
+            ObjMap* map = AS_MAP(value);
+            printf("{");
+
+            int total = map->count;
+
+            for(int i = 0; i < total; i++){
+                MapEntry* entry = &map->entries[i];
+
+                // printf("ADDRESS:%x\n", entry);
+
+                printValue(entry->key);
+                printf(": ");
+                printValue(entry->value);
+
+                if(i != total - 1){
+                    printf(", ");
+                }
+            }
+
+            printf("}");
+            break;
+        }
+
     }
 }
 
@@ -218,4 +243,10 @@ ObjList* newList(){
     ObjList* list = ALLOCATE_OBJ(ObjList, OBJ_LIST);
     initValueArray(&list->array);
     return list;
+}
+
+ObjMap* newMap(){
+    ObjMap* map = ALLOCATE_OBJ(ObjMap, OBJ_MAP);
+    initMap(map);
+    return map;
 }

@@ -91,6 +91,18 @@ void freeObject(Obj* object){
             break;
         }
 
+        case OBJ_LIST:{
+            ObjList* list = (ObjList*)object;
+            FREE(ObjList, object);
+            break;
+        }
+
+        case OBJ_MAP:{
+            ObjMap* list = (ObjMap*)object;
+            FREE(ObjMap, object);
+            break;
+        }
+
     }
 }
 
@@ -148,6 +160,14 @@ void markTable(Table* table){
     for(int i = 0; i<table->capacity; i++){
         Entry* entry = &table->entires[i];
         markObject((Obj*)entry->key);
+        markValue(entry->value);
+    }
+}
+
+void markMap(ObjMap* map){
+    for(int i = 0; i<map->capacity; i++){
+        MapEntry* entry = &map->entries[i];
+        markValue(entry->key);
         markValue(entry->value);
     }
 }
@@ -234,6 +254,12 @@ void blackendObject(Obj* object){
         case OBJ_LIST:{
             ObjList* list = (ObjList*) object;
             markArray(&list->array);
+            break;
+        }
+
+        case OBJ_MAP:{
+            ObjMap* map = (ObjMap*) map;
+            markMap(map);
             break;
         }
 
