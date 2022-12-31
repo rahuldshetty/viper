@@ -102,9 +102,10 @@ void namedVariable(Token name, bool canAssign);
 uint8_t argumentList(TokenType);
 void this_(bool);
 void super_(bool);
+void index_expr(bool);
 
 ParseRule rules[] = {
-  [TOKEN_LEFT_BRACKET]  = {list_literal,     NULL,   PREC_INDEX},
+  [TOKEN_LEFT_BRACKET]  = {list_literal,     index_expr,   PREC_INDEX},
   [TOKEN_RIGHT_BRACKET] = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
   [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
@@ -1123,4 +1124,21 @@ void super_(bool canAssign){
         namedVariable(syntheticToken("super"), false);
         emitBytes(OP_GET_SUPER, name);
     }
+}
+
+
+void index_expr(bool canAssign){
+    int index_item_count = 1;
+    
+    expression();
+
+    if(match_parser(TOKEN_COLON)){
+        expression();
+        index_item_count++;
+    }
+
+    consume(TOKEN_RIGHT_BRACKET, "Expected ']' after index expression.");
+
+    match_parser(TOKEN_SEMICOLON);
+    emitBytes(OP_INDEX, index_item_count);
 }

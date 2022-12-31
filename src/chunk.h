@@ -46,6 +46,7 @@ typedef enum {
     OP_SUPER_INVOKE,
     OP_LIST,
     OP_MAP,
+    OP_INDEX,
 } OpCode;
 
 

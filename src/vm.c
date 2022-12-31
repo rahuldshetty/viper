@@ -300,6 +300,24 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_INDEX:{
+                int item_count = READ_BYTE();
+                
+                // end Index
+                Value endIndex = NULL_VAL;
+                if(item_count > 1){
+                    endIndex = pop();
+                }
+
+                // Start index
+                Value index = pop();
+                Value object = pop();
+                if(!handleIndexOperator(object, index, endIndex)){
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+            }
+
             case OP_RETURN: {
                 Value result = pop();
                 closeUpvalues(frame->slots);
@@ -644,4 +662,87 @@ bool invoke(ObjString* name, int argCount){
     }
 
     return invokeFromClass(instance->kclass, name, argCount);
+}
+
+int objectLength(Value object){
+    if(IS_STRING(object)){
+        return AS_STRING(object)->length;
+    } else if(IS_LIST(object)){
+        return AS_LIST(object)->array.count;
+    }
+}
+
+bool arrayIndexExpression(Value object, Value index, Value endIndex){
+    if(!IS_NUMBER(index) || !isInteger(AS_NUMBER(index)) || 
+        ( !IS_NULL(endIndex) && !isInteger(AS_NUMBER(endIndex))) ){
+        runtimeError("Index expression must be integer literal.");
+        return false;
+    }
+        
+    int length = 1;
+    int position = AS_NUMBER(index);
+    int end_position;
+
+    int object_length = objectLength(object);
+
+    if(!IS_NULL(endIndex)){
+        end_position = AS_NUMBER(endIndex);
+        length = end_position - position;
+
+        // Handle Max length
+        length = length < object_length ? length : object_length; 
+    }
+
+    // Start Zero-indexed
+    if(position < 0 || position >= object_length){
+        runtimeError("String index out of bounds.");
+        return false;
+    }
+
+    // End-index Zero-indexed
+    if(!IS_NULL(endIndex) && (position > end_position || end_position < 0)){
+        runtimeError("String index out of bounds.");
+        return false;
+    }
+    
+    if(IS_STRING(object)){
+        ObjString* string = AS_STRING(object);
+        ObjString* newString = copyString(string->chars + position, length);
+        push(OBJ_VAL(newString));
+    } else if (IS_LIST(object)){
+        ObjList* list = AS_LIST(object);
+
+        // Case 1 : more than 1 element
+        if(!IS_NULL(endIndex) && end_position - position > 1){
+            ObjList* new_list = newList();
+            for(int i = end_position - 1; i >= position ; i--){
+                writeValueArray(&new_list->array, list->array.values[ object_length - i - 1]);
+            }
+            push(OBJ_VAL(new_list));
+        } else {
+            // Case 2: only one element
+            Value val = list->array.values[object_length - position - 1];
+            push(val);
+        }
+
+    }
+
+    
+
+    return true;
+}
+
+
+bool handleIndexOperator(Value object, Value index, Value endIndex){
+    if(!IS_MAP(object) && !IS_STRING(object) && !IS_LIST(object)){
+        runtimeError("Only map, list and string object support index expression.");
+        return false;
+    }
+
+    // String indexing
+    if(IS_STRING(object) || IS_LIST(object)){
+        return arrayIndexExpression(object, index, endIndex);
+    }
+
+    return true;
 }

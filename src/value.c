@@ -112,3 +112,7 @@ uint32_t hashValue(Value value){
     return 0;
 #endif
 }
+
+bool isInteger(double num){
+    return (num - (int)num) == 0;
+}

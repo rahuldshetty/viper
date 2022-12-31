@@ -8,6 +8,8 @@
 
 Token scanToken(){
     skipWhitespace();
+    if(isAtEnd()) return makeToken(TOKEN_EOF);
+
     scanner.start = scanner.current;
     
     if(isAtEnd()) return makeToken(TOKEN_EOF);
