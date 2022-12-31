@@ -69,6 +69,7 @@ bool bindMethod(ObjClass* klass, ObjString* name);
 bool invoke(ObjString* name, int argCount);
 bool invokeFromClass(ObjClass* klass, ObjString* name, int argCount);
 bool handleIndexOperator(Value, Value,Value);
+bool handleIndexSetOperator(Value object, Value index, Value result);
 int objectLength(Value object);
 
 #endif

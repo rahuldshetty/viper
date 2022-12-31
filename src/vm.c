@@ -318,6 +318,18 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_SET_INDEX:{
+                Value result = pop();
+                Value index = pop(); 
+                Value object = peek_stack(0);
+
+                if(!handleIndexSetOperator(object, index, result)){
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                
+                break;
+            }
+
             case OP_RETURN: {
                 Value result = pop();
                 closeUpvalues(frame->slots);
@@ -765,6 +777,67 @@ bool handleIndexOperator(Value object, Value index, Value endIndex){
     // Map indexing
     else if(IS_MAP(object)){
         return mapIndexExpression(object, index, endIndex);
+    }
+
+    return true;
+}
+
+bool arraySetOperator(Value object, Value index, Value result){
+    if(!IS_NUMBER(index) || !isInteger(AS_NUMBER(index))){
+        runtimeError("Index must be integer literal.");
+        return false; 
+    }
+
+    int position = AS_NUMBER(index);
+    int object_length = objectLength(object);
+
+    // Start Zero-indexed
+    if(position < 0 || position >= object_length){
+        runtimeError("String index out of bounds.");
+        return false;
+    }
+    
+    // List Object
+    if(IS_LIST(object)){
+        ObjList* list = AS_LIST(object);
+        Value* value = &list->array.values[object_length - position - 1];
+        *value = result;
+    } 
+
+    // String Object
+    else if(IS_STRING(object)){
+        if(!IS_STRING(result) || AS_STRING(result)->length != 1){
+            runtimeError("Target must be string data type with length 1.");
+            return false;
+        }
+
+        char* string = AS_CSTRING(object);
+        char* target_character = AS_CSTRING(result);
+
+        string[position] = target_character[0];
+    }
+    return true;
+}
+
+bool mapSetOperator(Value object, Value index, Value result){
+    ObjMap* map = AS_MAP(object);
+    mapSet(map, index, result);
+    return true;
+}
+
+bool handleIndexSetOperator(Value object, Value index, Value result){
+    if(!IS_MAP(object) && !IS_STRING(object) && !IS_LIST(object)){
+        runtimeError("Only map, list and string object support setting values.");
+        return false;
+    }
+
+    // String/List index set
+    if(IS_LIST(object) || IS_STRING(object)){
+        return arraySetOperator(object, index, result);
+    }
+     // Map index set
+    else if(IS_MAP(object)){
+        return mapSetOperator(object, index, result);
     }
 
     return true;

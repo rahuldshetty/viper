@@ -72,6 +72,9 @@ int disassembleInstruction(Chunk* chunk, int offset){
         case OP_LESS:
             return simpleInstruction("OP_LESS", offset);
 
+        case OP_SET_INDEX:
+            return simpleInstruction("OP_SET_INDEX", offset);
+
         case OP_INDEX:
             return byteInstruction("OP_INDEX", chunk, offset);
         

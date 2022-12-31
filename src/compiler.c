@@ -1139,6 +1139,15 @@ void index_expr(bool canAssign){
 
     consume(TOKEN_RIGHT_BRACKET, "Expected ']' after index expression.");
 
+    // Set Index Expression
+    if(canAssign && match_parser(TOKEN_EQUAL)){
+        expression();
+        emitByte(OP_SET_INDEX);
+    }
+    // Read Expression
+    else {
+        emitBytes(OP_INDEX, index_item_count);
+    }
+
     match_parser(TOKEN_SEMICOLON);
-    emitBytes(OP_INDEX, index_item_count);
 }
