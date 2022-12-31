@@ -726,8 +726,27 @@ bool arrayIndexExpression(Value object, Value index, Value endIndex){
         }
 
     }
+    return true;
+}
 
+
+bool mapIndexExpression(Value object, Value index, Value endIndex){
+    if(!IS_NULL(endIndex)){
+        runtimeError("Invalid ':' seperator for Map index expression.");
+        return false;
+    }
+    ObjMap* map = AS_MAP(object);
     
+    Value item;
+    
+    bool found = mapGet(map, index, &item);
+    
+    if(found){
+        push(item);
+    } else {
+        runtimeError("Unable to find key in Map.");
+        return false;
+    }
 
     return true;
 }
@@ -742,6 +761,10 @@ bool handleIndexOperator(Value object, Value index, Value endIndex){
     // String indexing
     if(IS_STRING(object) || IS_LIST(object)){
         return arrayIndexExpression(object, index, endIndex);
+    }
+    // Map indexing
+    else if(IS_MAP(object)){
+        return mapIndexExpression(object, index, endIndex);
     }
 
     return true;
