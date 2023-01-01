@@ -681,6 +681,8 @@ int objectLength(Value object){
         return AS_STRING(object)->length;
     } else if(IS_LIST(object)){
         return AS_LIST(object)->array.count;
+    } else if(IS_MAP(object)){
+        return AS_MAP(object)->count;
     }
 }
 

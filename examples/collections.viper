@@ -2,12 +2,10 @@ fn hello(name){
     print "Hello " + name
 }
 
-size = 5
-
 // List data structure
 items = [1, 2, "hello", hello, 5, 6]
 
-for(i = 0; i <= size; i = i + 1){
+for(i = 0; i < len(items); i = i + 1){
     print items[i];
 }
 
