@@ -683,7 +683,23 @@ int objectLength(Value object){
         return AS_LIST(object)->array.count;
     } else if(IS_MAP(object)){
         return AS_MAP(object)->count;
+    } else if(IS_INSTANCE(object)){
+        ObjClass* class = AS_INSTANCE(object)->kclass;
+        ObjString* string = copyString("len", 3);
+
+        int val = 0;
+
+        Value lenFunction;
+
+        if(tableGet(&class->methods, string, &lenFunction)){
+            callFn(AS_CLOSURE(lenFunction), 0);
+            val = AS_NUMBER(pop());
+        }
+
+        return val;
     }
+
+    return 0;
 }
 
 bool arrayIndexExpression(Value object, Value index, Value endIndex){
