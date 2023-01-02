@@ -684,21 +684,24 @@ int objectLength(Value object){
     } else if(IS_MAP(object)){
         return AS_MAP(object)->count;
     } else if(IS_INSTANCE(object)){
-        ObjClass* class = AS_INSTANCE(object)->kclass;
+        ObjInstance* instance = AS_INSTANCE(object);
         ObjString* string = copyString("len", 3);
 
+        push(object);
+
         int val = 0;
-
         Value lenFunction;
-
-        if(tableGet(&class->methods, string, &lenFunction)){
-            callFn(AS_CLOSURE(lenFunction), 0);
-            val = AS_NUMBER(pop());
+        if(tableGet(&instance->kclass->methods, string, &lenFunction)){
+            // val = callFn(AS_CLOSURE(lenFunction), 0);
+            // callValue(lenFunction, 0);
+            // // pop();
+            // val = peek_stack(0);
+            // printf("VOLVO:%d\n", val);
+            pop();
+            invokeFromClass(instance->kclass, string, 0);
         }
-
         return val;
     }
-
     return 0;
 }
 

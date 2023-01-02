@@ -122,6 +122,7 @@ ObjString* copyString(const char* chars, int length);
 void printObject(Value value);
 bool isObjType(Value value, ObjType type);
 ObjString* takeString(char* chars, int length);
+ObjString* allocateString(char* chars, int length, uint32_t hash);
 
 ObjFunction* newFunction();
 ObjClosure* newClosure(ObjFunction* function);
@@ -134,5 +135,7 @@ ObjInstance* newInstance(ObjClass* klass);
 ObjBoundMethod* newBoundMethod(Value receiver, ObjClosure* method);
 ObjList* newList();
 ObjMap* newMap();
+
+ObjString* strObject(Value obj);
 
 #endif

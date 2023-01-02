@@ -252,3 +252,75 @@ ObjMap* newMap(){
     initMap(map);
     return map;
 }
+
+// Format string as <$tag '$name'>
+ObjString* sprintTaggedString(const char* tag, const char* name){
+    char* result1 = concat("<", tag);
+    char* result2 = concat(result1, " '");
+    char* result3 = concat(result2, name);
+    char* result = concat(result3, "'>");
+    
+    ObjString* str_result = copyString(result, strlen(result));
+
+    free(result1);
+    free(result2);
+    free(result3);
+    free(result);
+
+    return str_result;
+}
+
+ObjString* sprintFunction(ObjFunction* function){
+    if(function->name == NULL){
+        return copyString("<script>", 8);
+    }
+    return sprintTaggedString("fn", function->name->chars);
+}
+
+ObjString* strObject(Value obj){
+    switch OBJ_TYPE(obj){
+        case OBJ_STRING:
+            return AS_STRING(obj);
+
+        case OBJ_FUNCTION:
+            return sprintFunction(AS_FUNCTION(obj));
+        
+        case OBJ_NATIVE:
+            return copyString("<built-in fn>", 13);
+        
+        case OBJ_CLOSURE:
+            return sprintFunction(AS_CLOSURE(obj)->function);
+
+        case OBJ_CLASS:
+            return sprintTaggedString("class", AS_CLASS(obj)->name->chars);
+        
+        case OBJ_INSTANCE:{
+            ObjClass* class = AS_INSTANCE(obj)->kclass;
+            ObjString* string = copyString("str", 3);
+
+            ObjString* result = NULL;
+            Value strFunction;
+
+            if(tableGet(&class->methods, string, &strFunction)){
+                callFn(AS_CLOSURE(strFunction), 0);
+                result = AS_STRING(pop());
+            }
+            if(result != NULL){
+                return result;
+            }
+
+            return sprintTaggedString("instance", AS_INSTANCE(obj)->kclass->name->chars);
+        }
+
+        case OBJ_LIST:
+            // TODO: Add support for list printing
+            break;
+
+        case OBJ_MAP:
+            // TODO: Add support for map printing
+            break;
+
+    }
+
+    return copyString("null", 4);
+}

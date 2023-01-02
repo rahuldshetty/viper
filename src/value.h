@@ -101,4 +101,6 @@ bool isInteger(double num);
 
 uint32_t hashValue(Value);
 
+ObjString* strValue(Value obj);
+
 #endif

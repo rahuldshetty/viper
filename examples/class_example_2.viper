@@ -13,12 +13,8 @@ class Point{
         return this.y
     }
 
-    fn out(){
-        print "Point ("
-        print this.x 
-        print this.y
-        print ")"
-        print ""
+    fn str(){
+        return "Point(" +  str( (this.x) ) + ", " + str( (this.y) ) + ")"
     }
 
     fn squared_distance(point){
@@ -37,10 +33,10 @@ class Point{
 }
 
 p1 = Point(0, 0)
-p1.out()
+print str(p1)
 
 p2 = Point(3, 4)
-p2.out()
+print str(p2)
 
 print p1.squared_distance(p2)
 print p2.squared_distance(p1)

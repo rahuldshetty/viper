@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "memory.h"
@@ -115,4 +116,49 @@ uint32_t hashValue(Value value){
 
 bool isInteger(double num){
     return (num - (int)num) == 0;
+}
+
+ObjString* strValue(Value obj){
+    // String
+    if(IS_STRING(obj)){
+        return AS_STRING(obj);
+    
+    // Number
+    } else if(IS_NUMBER(obj)){
+        double number = AS_NUMBER(obj);
+        int len = snprintf(NULL, 0, "%g", number);
+        
+        char *output = ALLOCATE(char, len+1);
+        
+        snprintf(output, len + 1, "%g", number);
+        
+        ObjString* string = copyString(output, len);
+        
+        FREE(char, output);
+        
+        return string;
+    }
+
+    // Bool Values
+    else if(IS_BOOL(obj)){
+        // True
+        if(AS_BOOL(obj)){
+            return copyString("true", 4);
+        }
+        // False 
+        else {
+            return copyString("false", 5);
+        }
+
+    }
+
+    // NULL Value
+    else if(IS_NULL(obj)){
+        return copyString("null", 4);
+    }
+
+    // Object Value
+    else if(IS_OBJ(obj)){
+        return strObject(obj);
+    }
 }

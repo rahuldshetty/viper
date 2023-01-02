@@ -2,10 +2,11 @@
 class StringStack{
     fn StringStack(init){
         this.init = init
+        this.count = len(init)
     }
 
     fn len(){
-        return len(this.init)
+        return this.count
     }
 
     fn out(){
@@ -14,15 +15,9 @@ class StringStack{
 
     fn append(s){
         this.init = this.init + s
+        this.count = this.count + len(s)
     }
 }
 
-s = StringStack("")
-s.append("hello")
-
-print s.out()
-print len(s)
-
-s.append(" world")
-print s.out()
+s = StringStack("hello")
 print len(s)

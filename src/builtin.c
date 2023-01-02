@@ -1,6 +1,8 @@
 #include <time.h>
 
 #include "builtin.h"
+#include "object.h"
+#include "value.h"
 
 /*
 Built-in function for Viper It Bytes.
@@ -11,12 +13,19 @@ Value clockNative(int argCount, Value* args){
 
 Value lenNative(int argCount, Value* args){
     Value item = args[0];
-    return NUMBER_VAL(objectLength(item));
+    Value result =  NUMBER_VAL(objectLength(item));
+    return result;
+}
+
+Value strNative(int argCount, Value* args){
+    Value item = args[0];
+    return OBJ_VAL(strValue(item));
 }
 
 void registerBuiltInFunctions(){
     defineNative("clock", clockNative);
     defineNative("len", lenNative);
+    defineNative("str", strNative);
 }
 
 
