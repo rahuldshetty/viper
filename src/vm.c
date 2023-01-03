@@ -466,6 +466,7 @@ InterpretResult run(){
                 break;
             }
 
+            
         }
     }
     #undef READ_STRING
@@ -522,6 +523,8 @@ void concatenate(){
     push(OBJ_VAL(result));
 }
 
+Value top = NULL_VAL;
+
 bool callFn(ObjClosure* closure, int argCount){
     if(argCount != closure->function->arity){
         runtimeError(
@@ -559,6 +562,7 @@ bool callValue(Value callee, int argCount){
                 push(result);
                 return true;
             }
+
             case OBJ_CLOSURE:{
                 return callFn(AS_CLOSURE(callee), argCount);
             }
@@ -685,20 +689,31 @@ int objectLength(Value object){
         return AS_MAP(object)->count;
     } else if(IS_INSTANCE(object)){
         ObjInstance* instance = AS_INSTANCE(object);
-        ObjString* string = copyString("len", 3);
-
-        push(object);
+        ObjString* method = copyString("len", 3);
 
         int val = 0;
         Value lenFunction;
-        if(tableGet(&instance->kclass->methods, string, &lenFunction)){
-            // val = callFn(AS_CLOSURE(lenFunction), 0);
+        
+        // val = NUMBER_VAL(10);
+        if(tableGet(&instance->kclass->methods, method, &lenFunction)){
+            // push(lenFunction);
+            // invokeFromClass(instance->kclass, string, 0);
+            // val = AS_NUMBER(peek_stack(0));
+
+            // push(OBJ_VAL(lenFunction));
+            // push(NUMBER_VAL(0));
+           
+            // Value top = pop();
+            
+            // Trial - 2
             // callValue(lenFunction, 0);
-            // // pop();
-            // val = peek_stack(0);
-            // printf("VOLVO:%d\n", val);
-            pop();
-            invokeFromClass(instance->kclass, string, 0);
+            // val = AS_NUMBER(peek_stack(0));
+            // val = 123;
+
+            //invoke(method, 0);
+            // top = pop();
+            // break;
+
         }
         return val;
     }

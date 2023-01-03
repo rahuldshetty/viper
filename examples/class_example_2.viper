@@ -35,9 +35,9 @@ class Point{
 p1 = Point(0, 0)
 print str(p1)
 
-p2 = Point(3, 4)
-print str(p2)
+// p2 = Point(3, 4)
+// print str(p2)
 
-print p1.squared_distance(p2)
-print p2.squared_distance(p1)
+// print p1.squared_distance(p2)
+// print p2.squared_distance(p1)
 

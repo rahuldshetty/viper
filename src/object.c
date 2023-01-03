@@ -302,8 +302,10 @@ ObjString* strObject(Value obj){
             Value strFunction;
 
             if(tableGet(&class->methods, string, &strFunction)){
-                callFn(AS_CLOSURE(strFunction), 0);
-                result = AS_STRING(pop());
+                // callFn(AS_CLOSURE(strFunction), 0);
+                // result = AS_STRING(peek_stack(0));
+                // push(strFunction);
+                // invoke(string, 0);
             }
             if(result != NULL){
                 return result;
