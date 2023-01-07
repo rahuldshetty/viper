@@ -688,34 +688,20 @@ int objectLength(Value object){
     } else if(IS_MAP(object)){
         return AS_MAP(object)->count;
     } else if(IS_INSTANCE(object)){
-        ObjInstance* instance = AS_INSTANCE(object);
-        ObjString* method = copyString("len", 3);
+        // ObjInstance* instance = AS_INSTANCE(object);
+        // ObjString* method = copyString("len", 3);
 
-        int val = 0;
-        Value lenFunction;
-        
-        // val = NUMBER_VAL(10);
-        if(tableGet(&instance->kclass->methods, method, &lenFunction)){
-            // push(lenFunction);
-            // invokeFromClass(instance->kclass, string, 0);
-            // val = AS_NUMBER(peek_stack(0));
-
-            // push(OBJ_VAL(lenFunction));
-            // push(NUMBER_VAL(0));
-           
-            // Value top = pop();
+        // Value result;
+        // push(method);
+        // if(tableGet(&instance->kclass->methods, method, &result)){
             
-            // Trial - 2
-            // callValue(lenFunction, 0);
-            // val = AS_NUMBER(peek_stack(0));
-            // val = 123;
+        // }
+        // push(method);
+        // invoke(method, 0);
+        // if(tableGet(&klass->methods, method, &lenFunction)){
 
-            //invoke(method, 0);
-            // top = pop();
-            // break;
-
-        }
-        return val;
+        // }
+        // return val;
     }
     return 0;
 }

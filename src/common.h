@@ -18,8 +18,8 @@
 #define UINT8_COUNT (UINT8_MAX + 1)
 
 // Remove below lines to print stack trace
-// #undef DEBUG_PRINT_CODE
-// #undef DEBUG_TRACE_EXECUTION
+#undef DEBUG_PRINT_CODE
+#undef DEBUG_TRACE_EXECUTION
 
 #undef DEBUG_STRESS_GC
 #undef DEBUG_LOG_GC

@@ -270,6 +270,56 @@ ObjString* sprintTaggedString(const char* tag, const char* name){
     return str_result;
 }
 
+
+// Format string as [str(values)....]
+ObjString* sprintList(ObjList* list){ 
+    char *result = "[";
+
+    for(int i = list->array.count-1; i >= 0; i--){
+        result = concat(result, strValue(list->array.values[i])->chars);
+
+        if(i != 0){
+            result = concat(result, ", ");
+        }
+    }
+
+    result = concat(result, "]");
+
+    ObjString* str_result = copyString(result, strlen(result));
+
+    free(result);
+
+    return str_result;
+}
+
+// Format string as {str(key):str(values)...}
+ObjString* sprintMap(ObjMap* map){ 
+    char *result = "{";
+
+    int count = map->count;
+    for(int i = 0; i < map->capacity; i++){
+        if(!IS_NULL(map->entries[i].key)){
+            MapEntry entry = map->entries[i];
+            result = concat(result, strValue(entry.key)->chars);
+            result = concat(result, ":");
+            result = concat(result, strValue(entry.value)->chars);
+            count--;
+
+            if(count!=0){
+                result = concat(result, ", ");
+            }
+        }
+    }
+
+    result = concat(result, "}");
+
+    ObjString* str_result = copyString(result, strlen(result));
+
+    free(result);
+
+    return str_result;
+}
+
 ObjString* sprintFunction(ObjFunction* function){
     if(function->name == NULL){
         return copyString("<script>", 8);
@@ -315,12 +365,10 @@ ObjString* strObject(Value obj){
         }
 
         case OBJ_LIST:
-            // TODO: Add support for list printing
-            break;
+            return sprintList(AS_LIST(obj));
 
         case OBJ_MAP:
-            // TODO: Add support for map printing
-            break;
+            return sprintMap(AS_MAP(obj));
 
     }
 

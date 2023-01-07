@@ -20,4 +20,5 @@ class StringStack{
 }
 
 s = StringStack("hello")
-print len(s)
+print s.len()
+
