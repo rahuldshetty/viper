@@ -1,6 +1,6 @@
+// Variable
 SEPERATOR = "--------------------------------------"
 
-// Variable
 var breakfast = "beignets";
 beverage = "cafe au lait"
 
