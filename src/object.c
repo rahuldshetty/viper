@@ -193,6 +193,7 @@ ObjNative* newNative(NativeFn function){
     native->function = function;
     return native;
 }
+
 ObjClosure* newClosure(ObjFunction* function){
     ObjUpvalue** upvalues = ALLOCATE(ObjUpvalue*, function->upvalueCount);
     

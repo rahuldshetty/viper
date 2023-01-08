@@ -25,6 +25,7 @@ void initVM(){
 
     initTable(&vm.globals);
     initTable(&vm.strings);
+    initTable(&vm.constants);
 
     registerBuiltInFunctions();
 }
@@ -74,6 +75,7 @@ void defineNative(const char* name, NativeFn function){
 void freeVM(){
     freeTable(&vm.globals);
     freeTable(&vm.strings);
+    freeTable(&vm.constants);
     freeObjects();
 }
 

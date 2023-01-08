@@ -23,8 +23,9 @@ typedef struct {
 
     Value stack[STACK_MAX]; // TODO: dynamically grow Stack
     Value* stackTop;
-    Table globals;
+    Table globals;  // global variables
     Table strings;
+    Table constants; // global constants
     struct ObjUpvalue* openUpvalues;
     Obj* objects;
 
