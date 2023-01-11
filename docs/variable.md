@@ -13,7 +13,7 @@
     <identifer> = <value>
     ```
 
-### Example
+## Example
 
 Create a file called *[variable.viper](https://github.com/rahuldshetty/viper/tree/master/examples/variable.viper)*:
 
@@ -46,6 +46,26 @@ What I had? beignets with cafe au lait
 List Items: [1, 2, hello, 4]
 --------------------------------------
 ```
+
+## Data Types
+
+Variables can store data of different types and provide different functionalities on them.
+
+### Primitive Datatype:
+
+These are the basic form of data types that is used to represent a single entity value.
+
+- [Number](/datatypes/number.md)
+- [Boolean](/datatypes/boolean.md)
+- [String](/datatypes/string.md)
+
+### Secondary Datatype:
+
+Secondary Data types refer to a collection of elements where each element can be of primitive or secondary datatype. It is used to represent a grouped entity.
+
+- [List](/datatypes/list.md)
+- [Map](/datatypes/map.md)
+
 
 ## Note
 

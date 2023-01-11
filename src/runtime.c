@@ -4,7 +4,7 @@
 ObjClass* addGlobalClass(const char *name, ObjClass *super){
     ObjString* className = copyString(name, strlen(name));
     ObjClass* class = newClass(className);
-    tableSet(&vm.constants, OBJ_VAL(className), OBJ_VAL(class));
+    // tableSet(&vm.constants, OBJ_VAL(className), OBJ_VAL(class));
     return class;
 }
 
