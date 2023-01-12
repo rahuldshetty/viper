@@ -38,7 +38,7 @@ testPalindrome(test_failure_string)
 
 ```
 
-Output:
+Output
 ```
 Given string 'saippuakivikauppias' is Palindromic.
 Given string 'abracadabra' is NOT Palindromic.

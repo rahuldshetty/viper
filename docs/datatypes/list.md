@@ -20,7 +20,8 @@ for i=0 ; i < len(items); i = i + 1 {
 
 ```
 
-```Output
+Output
+```
 1
 2
 hello
@@ -30,5 +31,5 @@ hello
 
 ## Note
 
-- List elements are stored in consecutive location in memory. They are created with additional buffer and whenever a list is completed occupied, the existing list is copied onto a new dynamic list with larger size.
-- 
+- List elements are stored in consecutive locations in memory. 
+- They are always created/expanded with additional buffer and this buffer limit is reached and a new element has to be inserted then, the existing list is copied onto a new dynamic with larger size.
