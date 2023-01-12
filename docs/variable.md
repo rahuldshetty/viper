@@ -49,7 +49,11 @@ List Items: [1, 2, hello, 4]
 
 ## Data Types
 
-Variables can store data of different types and provide different functionalities on them.
+Variables in Viper can store some of the standard types of data objects: `Number, Boolean, String, List, Map`
+
+Data within a variable can be manipulated using functions and operators available as part of Viper interpreter (more info on this in [Operators](/operators.md) section). 
+
+Based on the order of dependency between some of the data types, they have been grouped into two buckets.
 
 ### Primitive Datatype:
 
