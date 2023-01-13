@@ -38,5 +38,5 @@ Map: {USA:Washington DC, France:Paris, Japan:Tokyo, India:New Delhi}
 
 ## Note
 
-- If a key doesn't exist in the Map then the interpreter errors out. (TODO: Implementation of Try/Catch and Error Objects)
+- If a key doesn't exist in the Map then the interpreter errors out.
 - Map uses an internal hash function to find the right location to perform insertion and search. If location is occupied then it performs [Linear Probing](https://en.wikipedia.org/wiki/Linear_probing) to find the next best location for the task.

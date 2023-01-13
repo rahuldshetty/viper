@@ -8,9 +8,7 @@
     - [String](datatypes/string.md)
     - [List](datatypes/list.md)
     - [Map](datatypes/map.md)
-
-<!-- 
 - [Operators](operators.md)
 - [Control Statements](control_statements.md)
 - [Function](function.md)
-- [What's Next?](future.md) -->
+- [What's Next?](future.md)
