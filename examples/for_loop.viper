@@ -1,5 +1,4 @@
 // Fibonacci Program
-// in language "Viper, it Bytes".
 
 f = 0
 s = 1

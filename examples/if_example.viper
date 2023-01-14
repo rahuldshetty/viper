@@ -1,4 +1,3 @@
-
 number = 10
 
 if  number >= 10   {
@@ -6,5 +5,3 @@ if  number >= 10   {
 } else {
     print "Number is less than 10"
 }
-
-print "OK";
