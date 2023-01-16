@@ -1,4 +1,3 @@
-
 # Variables <!-- {docsify-ignore-all} -->
 
 **Viper** is dynamically typed programming language that means developers don't have to specify any datatypes during variable declaration.

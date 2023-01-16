@@ -1,21 +1,24 @@
-class A{
-    fn method(){
-        print "A method"
+class Animal{
+    fn Animal(name){
+        this.name = name
+    }
+
+    fn eat(){
+        print this.name + " eating..."
     }
 }
 
-class B (A) {
-    fn method(){
-        print "B method"
+class Bird (Animal) {
+    fn Bird(name, type){
+        super.Animal(name)
+        this.type = type
     }
 
-    fn test(){
-        super.method()
+    fn fly(){
+        print this.type + " flying..."
     }
 }
 
-b = B()
-
-b.method()
-
-b.test()
+parrot = Bird("Sam", "parrot")
+parrot.eat()
+parrot.fly()

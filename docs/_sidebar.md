@@ -11,4 +11,8 @@
 - [Operators](operators.md)
 - [Control Statements](control_statements.md)
 - [Function](function.md)
+- [Object Oriented Programming](oops/intro.md)
+    - [Constructors](oops/constructor.md)
+    - [Inheritance](oops/inheritance.md)
+- [Viper Developer Guide](developer/intro.md)
 - [What's Next?](future.md)

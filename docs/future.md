@@ -1,4 +1,4 @@
-# Future
+# Future <!-- {docsify-ignore-all} -->
 
 I have built this project by learning the concepts of Compiler designing and based on a language called "clox" from the book [Crafting Interpreters](https://craftinginterpreters.com). The author of this book, Robert Nystorm has come up with great exercise materials for the readers to implement in their language. Some of these are added feature that will make Viper more robust and almost production equivalent to modern day languages. I will be working on some of these enhancements.
 
