@@ -1,0 +1,1 @@
+cd cmake; cmake . ; make install

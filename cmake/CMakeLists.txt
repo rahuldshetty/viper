@@ -46,3 +46,5 @@ add_library(${PACKAGE_LIB}
 )
 
 target_link_libraries(${PACKAGE} PUBLIC ${PACKAGE_LIB})
+
+install(TARGETS ${PACKAGE} DESTINATION bin)
