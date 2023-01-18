@@ -1,3 +1,5 @@
 .vscode/
 bin/
 release/
+cmake/*
+!cmake/CMakeLists.txt

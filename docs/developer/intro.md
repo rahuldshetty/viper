@@ -5,20 +5,14 @@ The following guide provides steps to build and run Viper.
 ## Prerequisite 
 
 * make tool - [Windows](https://gnuwin32.sourceforge.net/packages/make.htm) [Other Platforms](https://www.gnu.org/software/make/)
+* [CMAKE](https://cmake.org/download/)
 * [GCC](https://gcc.gnu.org/install/binaries.html)
 
-## Running Viper Interpreter
+## Building Viper
 
 1) Download Viper repository from Github: `git clone https://github.com/rahuldshetty/viper.git`
-2) Open terminal and switch to Viper directory: `cd viper`
-3) Use make tool to build & run Viper: `make run`.
+2) Open terminal and switch to Viper's cmake directory: `cd viper/cmake`
+3) Use cmake tool to build make dependencies: `cmake .`.
+4) Use the make tool to compile and generate Viper executables for your platform: `make`
 
-This will start the Viper interpreter.
-
-## Building Viper release
-
-1) Download Viper repository from Github: `git clone https://github.com/rahuldshetty/viper.git`
-2) Open terminal and switch to Viper directory: `cd viper`
-3) Use make tool to build & run Viper: `make release`. 
-
-This will create Viper binaries under "release" folder of the repository.
+This will create Viper binaries under "cmake/bin" directory.
