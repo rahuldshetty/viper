@@ -35,7 +35,34 @@ bool match(char expected){
     return true;
 }
 
-void skipWhitespace(){
+bool skipBlockComments(){
+    if(match('/') && match('*')){
+        int nesting = 1;
+
+        while(nesting > 0){
+            if(isAtEnd()){
+                return false;
+            }
+
+            if(peek() == '/' && peekNext() == '*'){
+                advance();
+                advance();
+                nesting++;
+            }
+            
+            if(peek() == '*' && peekNext() == '/'){
+                advance();
+                advance();
+                nesting--;
+            } 
+
+            advance();
+        }
+    }
+    return true;
+}
+
+bool skipWhitespace(){
     for(;;){
         char c = peek();
 
@@ -53,6 +80,7 @@ void skipWhitespace(){
                 break;
 
             case '/':
+                // Single line comment
                 if(peekNext() == '/'){
                     // skip comment 
                     while (peek() != '\n' && !isAtEnd()) advance();
@@ -61,11 +89,19 @@ void skipWhitespace(){
                     scanner.line++;
                     advance();
                     continue;
-                } else {
-                    return;
+                }
+                else if(peekNext() == '*'){
+                    // Skip multi-line comments
+                    if(!skipBlockComments()){
+                        return false;
+                    }
+                    continue;
+                }
+                else {
+                    return true;
                 }
             default:
-                return;
+                return true;
         }
     }
 }

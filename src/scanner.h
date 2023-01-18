@@ -11,7 +11,7 @@ typedef struct {
 
 void initScanner(const char* source);
 
-void skipWhitespace();
+bool skipWhitespace();
 
 char advance();
 char peek();

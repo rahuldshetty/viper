@@ -7,7 +7,10 @@
 // TODO: Contextual Keywords - async, await, 
 
 Token scanToken(){
-    skipWhitespace();
+    if(!skipWhitespace()){
+        return errorToken("Unexepcted whitespace character.");
+    }
+
     if(isAtEnd()) return makeToken(TOKEN_EOF);
 
     scanner.start = scanner.current;
@@ -18,7 +21,6 @@ Token scanToken(){
 
     // Make sure current  token is not EOF
     if(isAtEnd()) return makeToken(TOKEN_EOF);
-
     if(isAlpha(c)) return identifier();
     if(isDigit(c)) return number();
 

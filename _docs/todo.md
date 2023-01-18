@@ -1,4 +1,4 @@
-0) Multi-line comments
+# TODO:
 
 1) Extend `clox` to allow more than 256 local variables to be in scope at a time.
 
@@ -115,4 +115,7 @@ If Lox was your language, how would you address this, if at all? If you would ch
 
 Other languages, like Ruby, do allow classes to be modified after the fact. How do implementations of languages like that support class modification while keeping method resolution efficient?
 
-33) 
+
+# DONE:
+
+0) Multi-line comments 
