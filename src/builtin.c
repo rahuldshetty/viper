@@ -3,6 +3,7 @@
 #include "builtin.h"
 #include "object.h"
 #include "value.h"
+#include "vm.h"
 
 /*
 Built-in function for Viper It Bytes.
