@@ -274,7 +274,14 @@ InterpretResult run(){
                 for(int i=0; i < itemCount; i++){
                     writeValueArray(&list->array, pop());
                 }
-                push(OBJ_VAL(list));
+
+                ObjList* reversedList = newList();
+                for(int i=itemCount - 1; i >= 0; i--){
+                    writeValueArray(&reversedList->array, list->array.values[i]);
+                }
+
+                FREE(ObjList, list);
+                push(OBJ_VAL(reversedList));
                 break;
             }
 
@@ -379,24 +386,42 @@ InterpretResult run(){
             }
 
             case OP_GET_PROPERTY:{
-                if(!IS_INSTANCE(peek_stack(0))){
+                if(!IS_INSTANCE(peek_stack(0)) && !IS_LIST(peek_stack(0))){
                     runtimeError("Only instances have property.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
-                ObjInstance* instance = AS_INSTANCE(peek_stack(0));
-                ObjString* name = READ_STRING();
+                // Get property on Class Objects
+                if(IS_INSTANCE(peek_stack(0))){
+                    ObjInstance* instance = AS_INSTANCE(peek_stack(0));
+                    ObjString* name = READ_STRING();
 
-                Value value;
-                if(tableGet(&instance->fields, name, &value)){
-                    pop();
-                    push(value);
+                    Value value;
+                    if(tableGet(&instance->fields, name, &value)){
+                        pop();
+                        push(value);
+                        break;
+                    }
+                    
+                    if(!bindMethod(instance->kclass, name)){
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
                     break;
+                } 
+                // Get property on List object
+                else if(IS_LIST(peek_stack(0))){
+                    ObjList* list = AS_LIST(peek_stack(0));
+                    ObjString* name = READ_STRING();
+                    
+                    Value value;
+                    if(tableGet(&list->nativeMethods, name, &value)){
+                        pop();
+                        push(value);
+                        break;
+                    } else {
+                        runtimeError("List method '%s' not found.", name->chars);
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
                 }
-                
-                if(!bindMethod(instance->kclass, name)){
-                    return INTERPRET_RUNTIME_ERROR;
-                }
-                break;
             }
 
             case OP_SET_PROPERTY:{
@@ -550,6 +575,19 @@ bool callFn(ObjClosure* closure, int argCount){
     return true;
 }
 
+bool callNativeObjMethod(Value self, Value callee, int argCount){
+    ObjNative* obj = AS_NATIVE_OBJ(callee);
+    NativeObjFn native = obj->function.objMethod;
+    Value result = native(
+        argCount,
+        self,
+        vm.stackTop - argCount
+    );
+    vm.stackTop -= argCount + 1;
+    push(result);
+    return true;
+}
+
 bool callValue(Value callee, int argCount){
     if(IS_OBJ(callee)){
         switch (OBJ_TYPE(callee)){
@@ -557,12 +595,25 @@ bool callValue(Value callee, int argCount){
                 ObjClosure* closure = newClosure(AS_FUNCTION(callee));
                 return callFn(closure, argCount);
             }
+
             case OBJ_NATIVE:{
-                NativeFn native = AS_NATIVE(callee);
-                Value result = native(argCount, vm.stackTop - argCount);
-                vm.stackTop -= argCount + 1;
-                push(result);
-                return true;
+                ObjNative* obj = AS_NATIVE_OBJ(callee);
+
+                switch(obj->type){
+                    case NATIVE_METHOD: {
+                        NativeFn native = obj->function.method;
+                        Value result = native(argCount, vm.stackTop - argCount);
+                        vm.stackTop -= argCount + 1;
+                        push(result);
+                        return true;
+                    }
+
+                    default: {
+                        runtimeError("Invalid built-in method type.");
+                        return false;
+                    }
+
+                }
             }
 
             case OBJ_CLOSURE:{
@@ -666,20 +717,35 @@ bool invokeFromClass(ObjClass* klass, ObjString* name, int argCount){
 bool invoke(ObjString* name, int argCount){
     Value receiver = peek_stack(argCount);
 
-    if(!IS_INSTANCE(receiver)){
-        runtimeError("Only instances have methods.");
+    if(!IS_INSTANCE(receiver) && !IS_LIST(receiver)){
+        runtimeError("Only instances & native objects have methods.");
         return false;
     }
 
-    ObjInstance* instance = AS_INSTANCE(receiver);
+    // Instance method call
+    if(IS_INSTANCE(receiver)){
+        ObjInstance* instance = AS_INSTANCE(receiver);
 
-    Value value;
-    if(tableGet(&instance->fields, name, &value)){
-        vm.stackTop[-argCount-1] = value;
-        return callValue(value, argCount);
+        Value value;
+        if(tableGet(&instance->fields, name, &value)){
+            vm.stackTop[-argCount-1] = value;
+            return callValue(value, argCount);
+        }
+
+        return invokeFromClass(instance->kclass, name, argCount);
+    } 
+    // List method call
+    else if(IS_LIST(receiver)){
+        ObjList* list = AS_LIST(receiver);
+        Value method;
+        if(tableGet(&list->nativeMethods, name, &method)){
+            vm.stackTop[-argCount-1] = method;
+            return callNativeObjMethod(receiver, method, argCount);
+        } else {
+            runtimeError("List method '%s' not found.", name->chars);
+            return false;
+        }
     }
-
-    return invokeFromClass(instance->kclass, name, argCount);
 }
 
 int objectLength(Value object){

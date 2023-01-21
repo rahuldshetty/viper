@@ -1,15 +1,16 @@
 
 #include "runtime.h"
 
-ObjClass* addGlobalClass(const char *name, ObjClass *super){
-    ObjString* className = copyString(name, strlen(name));
-    ObjClass* class = newClass(className);
-    // tableSet(&vm.constants, OBJ_VAL(className), OBJ_VAL(class));
-    return class;
-}
-
-ObjNative* addNativeMethod(void *klass, const char* name, NativeFn func){
+ObjNative* addNativeMethod(Table* method, const char* name, NativeFn func){
     ObjString* mname = copyString(name, strlen(name));
     ObjNative* natFn = newNative(func);
-    
+    tableSet(method, mname, OBJ_VAL(natFn));
+    return natFn;
+}
+
+ObjNative* addNativeObjMethod(Table* method, const char* name, NativeObjFn func){
+    ObjString* mname = copyString(name, strlen(name));
+    ObjNative* natFn = newObjNative(func);
+    tableSet(method, mname, OBJ_VAL(natFn));
+    return natFn;
 }

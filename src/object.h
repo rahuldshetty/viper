@@ -23,6 +23,7 @@
 #define AS_FUNCTION(value) ((ObjFunction*)AS_OBJ(value))
 #define AS_CLOSURE(value) ((ObjClosure*)AS_OBJ(value))
 #define AS_NATIVE(value) (((ObjNative*)AS_OBJ(value))->function)
+#define AS_NATIVE_OBJ(value) ((ObjNative*)AS_OBJ(value))
 #define AS_CLASS(value) ((ObjClass*)AS_OBJ(value))
 #define AS_INSTANCE(value) ((ObjInstance*)AS_OBJ(value))
 #define AS_BOUND_METHOD(value) ((ObjBoundMethod*)AS_OBJ(value))
@@ -97,6 +98,7 @@ typedef struct {
 typedef struct{
     Obj obj;
     ValueArray array;
+    Table nativeMethods;
 } ObjList;
 
 typedef struct {
@@ -112,10 +114,21 @@ typedef struct{
 } ObjMap;
 
 typedef Value (*NativeFn)(int argCount, Value* args);
+typedef Value (*NativeObjFn)(int argCount, Value obj, Value* args);
+
+typedef enum {
+    NATIVE_METHOD,     // called directly - len, str
+    NATIVE_OBJ_METHOD, // part of list/map/etc
+} NativeType;
 
 typedef struct{
     Obj obj;
-    NativeFn function;
+    NativeType type;
+    union
+    {
+        NativeObjFn objMethod;
+        NativeFn method;
+    } function;
 } ObjNative;
 
 ObjString* copyString(const char* chars, int length);
@@ -127,6 +140,7 @@ ObjString* allocateString(char* chars, int length, uint32_t hash);
 ObjFunction* newFunction();
 ObjClosure* newClosure(ObjFunction* function);
 ObjNative* newNative(NativeFn function);
+ObjNative* newObjNative(NativeObjFn function);
 
 ObjUpvalue* newObjUpvalue(Value* slot);
 

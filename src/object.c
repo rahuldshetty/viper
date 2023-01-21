@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "list.h"
 #include "memory.h"
 #include "map.h"
 #include "object.h"
@@ -133,9 +134,9 @@ void printObject(Value value){
             
             int total = list->array.count;
 
-            for(int i = total-1; i >= 0; i--){
+            for(int i = 0; i < total; i++){
                 printValue(list->array.values[i]);
-                if(i != 0){
+                if(i != total - 1){
                     printf(", ");
                 }
             }
@@ -190,7 +191,15 @@ ObjString* takeString(char* chars, int length){
 
 ObjNative* newNative(NativeFn function){
     ObjNative* native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
-    native->function = function;
+    native->type = NATIVE_METHOD;
+    native->function.method = function;
+    return native;
+}
+
+ObjNative* newObjNative(NativeObjFn function){
+    ObjNative* native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+    native->type = NATIVE_OBJ_METHOD;
+    native->function.objMethod = function;
     return native;
 }
 
@@ -245,6 +254,8 @@ ObjBoundMethod* newBoundMethod(Value receiver, ObjClosure* method){
 ObjList* newList(){
     ObjList* list = ALLOCATE_OBJ(ObjList, OBJ_LIST);
     initValueArray(&list->array);
+    initTable(&list->nativeMethods);
+    initListNativeMethods(list);
     return list;
 }
 
@@ -273,13 +284,13 @@ ObjString* sprintTaggedString(const char* tag, const char* name){
 
 
 // Format string as [str(values)....]
-ObjString* sprintList(ObjList* list){ 
+ObjString* sprintList(ObjList* list){
     char *result = "[";
-
-    for(int i = list->array.count-1; i >= 0; i--){
+    int total = list->array.count;
+    for(int i = 0; i < total; i++){
         result = concat(result, strValue(list->array.values[i])->chars);
 
-        if(i != 0){
+        if(i != total-1){
             result = concat(result, ", ");
         }
     }

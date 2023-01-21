@@ -2,9 +2,10 @@
 #define viper_runtime_h
 
 #include "object.h"
+#include "table.h"
 #include "vm.h"
 
-ObjClass* addGlobalClass(const char *name, ObjClass *super);
-ObjNative* addNativeMethod(void *klass, const char* name, NativeFn func);
+ObjNative* addNativeMethod(Table* method, const char* name, NativeFn func);
+ObjNative* addNativeObjMethod(Table* method, const char* name, NativeObjFn func);
 
 #endif

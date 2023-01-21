@@ -23,6 +23,8 @@ add_library(${PACKAGE_LIB}
     ${SRC_DIR}/compiler.h
     ${SRC_DIR}/debug.c
     ${SRC_DIR}/debug.h
+    ${SRC_DIR}/list.c
+    ${SRC_DIR}/list.h
     ${SRC_DIR}/map.c
     ${SRC_DIR}/map.h
     ${SRC_DIR}/memory.c
