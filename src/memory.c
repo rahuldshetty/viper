@@ -93,6 +93,7 @@ void freeObject(Obj* object){
 
         case OBJ_LIST:{
             ObjList* list = (ObjList*)object;
+            freeTable(&list->nativeMethods);
             FREE(ObjList, object);
             break;
         }

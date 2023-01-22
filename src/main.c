@@ -34,7 +34,7 @@ char* readFile(const char* path){
     rewind(file);
 
     // Allocate dynamic string
-    char* buffer = (char*) malloc(fileSize + 1);
+    char* buffer = (char*) malloc(fileSize + 2);
     if(buffer==NULL){
         fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
         exit(74);
@@ -46,7 +46,8 @@ char* readFile(const char* path){
         exit(74);
     }
 
-    buffer[bytesRead] = '\0';
+    buffer[bytesRead] = '\n';
+    buffer[bytesRead + 1] = '\0';
 
     fclose(file);
     return buffer;

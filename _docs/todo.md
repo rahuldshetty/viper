@@ -77,21 +77,11 @@ Extend the native function system to support that. How does this capability affe
 
 Change clox to only wrap functions in ObjClosures that need upvalues. How does the code complexity and performance compare to always wrapping functions? Take care to benchmark programs that do and do not use closures. How should you weight the importance of each benchmark? If one gets slower and one faster, how do you decide what trade-off to make to choose an implementation strategy?
 
-22) A famous koan teaches us that “objects are a poor man’s closure” (and vice versa). Our VM doesn’t support objects yet, but now that we have closures we can approximate them. Using closures, write a Lox program that models two-dimensional vector “objects”. It should:
-
-Define a “constructor” function to create a new vector with the given x and y coordinates.
-
-Provide “methods” to access the x and y coordinates of values returned from that constructor.
-
-Define an addition “method” that adds two vectors and produces a third.
-
 23) The Obj header struct at the top of each object now has three fields: type, isMarked, and next. How much memory do those take up (on your machine)? Can you come up with something more compact? Is there a runtime cost to doing so?
 
 24) When the sweep phase traverses a live object, it clears the isMarked field to prepare it for the next collection cycle. Can you come up with a more efficient approach?
 
 25) Mark-sweep is only one of a variety of garbage collection algorithms out there. Explore those by replacing or augmenting the current collector with another one. Good candidates to consider are reference counting, Cheney’s algorithm, or the Lisp 2 mark-compact algorithm.
-
-26) BUG: File compilation requires end of file new-line to run. 
 
 27) Trying to access a non-existent field on an object immediately aborts the entire VM. The user has no way to recover from this runtime error, nor is there any way to see if a field exists before trying to access it. It’s up to the user to ensure on their own that only valid fields are read.
 
@@ -111,11 +101,8 @@ The easy part is remembering to call super.init() in each subclass’s init() me
 
 If Lox was your language, how would you address this, if at all? If you would change the language, implement your change.
 
-32) Our copy-down inheritance optimization is valid only because Lox does not permit you to modify a class’s methods after its declaration. This means we don’t have to worry about the copied methods in the subclass getting out of sync with later changes to the superclass.
-
-Other languages, like Ruby, do allow classes to be modified after the fact. How do implementations of languages like that support class modification while keeping method resolution efficient?
-
 
 # DONE:
 
 0) Multi-line comments 
+26) BUG: File compilation requires end of file new-line to run. 
