@@ -817,13 +817,13 @@ bool arrayIndexExpression(Value object, Value index, Value endIndex){
         // Case 1 : more than 1 element
         if(!IS_NULL(endIndex) && end_position - position > 1){
             ObjList* new_list = newList();
-            for(int i = end_position - 1; i >= position ; i--){
-                writeValueArray(&new_list->array, list->array.values[ object_length - i - 1]);
+            for(int i = position; i < end_position ; i++){
+                writeValueArray(&new_list->array, list->array.values[i]);
             }
             push(OBJ_VAL(new_list));
         } else {
             // Case 2: only one element
-            Value val = list->array.values[object_length - position - 1];
+            Value val = list->array.values[position];
             push(val);
         }
 
