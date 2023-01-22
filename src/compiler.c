@@ -145,6 +145,8 @@ ParseRule rules[] = {
   [TOKEN_TRUE]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_BREAK]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_CONTINUE]      = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EOF]           = {NULL,     NULL,   PREC_NONE},
 };
@@ -859,7 +861,12 @@ void statement(){
         beginScope();
         block();
         endScope();
-    } else {
+    } else if(match_parser(TOKEN_BREAK)){
+        breakStatement();
+    } else if(match_parser(TOKEN_CONTINUE)){
+        continueStatement();
+    }
+    else {
         expressionStatement();
     }
 }
@@ -976,6 +983,15 @@ void forStatement(){
 
     // End scope
     endScope();
+}
+
+void breakStatement(){
+    match_parser(TOKEN_SEMICOLON);
+}
+
+void continueStatement(){
+    
+    match_parser(TOKEN_SEMICOLON);
 }
 
 void expressionStatement(){

@@ -53,14 +53,6 @@ switchCase     → "case" expression ":" statement* ;
 defaultCase    → "default" ":" statement* ;
 To execute a switch statement, first evaluate the parenthesized switch value expression. Then walk the cases. For each case, evaluate its value expression. If the case value is equal to the switch value, execute the statements under the case and then exit the switch statement. Otherwise, try the next case. If no case matches and there is a default clause, execute its statements.
 
-
-
-17) Add support for break and continue statements.
-
-A continue statement jumps directly to the top of the nearest enclosing loop, skipping the rest of the loop body. Inside a for loop, a continue jumps to the increment clause, if there is one. It’s a compile-time error to have a continue statement not enclosed in a loop.
-
-Make sure to think about scope. What should happen to local variables declared inside the body of the loop or in blocks nested inside the loop when a continue is executed?
-
 18) Reading and writing the ip field is one of the most frequent operations inside the bytecode loop. Right now, we access it through a pointer to the current CallFrame. That requires a pointer indirection which may force the CPU to bypass the cache and hit main memory. That can be a real performance sink.
 
 Ideally, we’d keep the ip in a native CPU register. C doesn’t let us require that without dropping into inline assembly, but we can structure the code to encourage the compiler to make that optimization. If we store the ip directly in a C local variable and mark it register, there’s a good chance the C compiler will accede to our polite request.
@@ -101,8 +93,17 @@ The easy part is remembering to call super.init() in each subclass’s init() me
 
 If Lox was your language, how would you address this, if at all? If you would change the language, implement your change.
 
+# PROGRESS:
+
+17) Add support for break and continue statements.
+
+A continue statement jumps directly to the top of the nearest enclosing loop, skipping the rest of the loop body. Inside a for loop, a continue jumps to the increment clause, if there is one. It’s a compile-time error to have a continue statement not enclosed in a loop.
+
+Make sure to think about scope. What should happen to local variables declared inside the body of the loop or in blocks nested inside the loop when a continue is executed?
+
 
 # DONE:
 
 0) Multi-line comments 
+
 26) BUG: File compilation requires end of file new-line to run. 

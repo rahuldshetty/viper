@@ -26,6 +26,8 @@ void statement();
 void returnStatement();
 void printStatement();
 void expressionStatement();
+void breakStatement();
+void continueStatement();
 
 void ifStatement();
 void whileStatement();
