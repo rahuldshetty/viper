@@ -39,6 +39,7 @@ Token scanToken(){
         case '+': return makeToken(TOKEN_ADD);
         case '/': return makeToken(TOKEN_DIVIDE);
         case '*': return makeToken(TOKEN_MULTIPLY);
+        case '%': return makeToken(TOKEN_MOD);
         case ':': return makeToken(TOKEN_COLON);
 
         case '!':

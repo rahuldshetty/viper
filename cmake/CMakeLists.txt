@@ -47,6 +47,6 @@ add_library(${PACKAGE_LIB}
     ${SRC_DIR}/vm.h
 )
 
-target_link_libraries(${PACKAGE} PUBLIC ${PACKAGE_LIB})
+target_link_libraries(${PACKAGE} PUBLIC ${PACKAGE_LIB} m)
 
 install(TARGETS ${PACKAGE} DESTINATION bin)

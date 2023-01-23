@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -158,6 +159,16 @@ InterpretResult run(){
             case OP_MINUS:          BINARY_OP(NUMBER_VAL, -); break;
             case OP_MULTIPLY:       BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:         BINARY_OP(NUMBER_VAL, /); break;
+            case OP_MOD:{
+                double b = AS_NUMBER(pop());
+                double a = AS_NUMBER(pop());
+                if(b == 0){
+                    runtimeError("ZeroDivisionError: modulo by zero is invalid.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                push( NUMBER_VAL( fmod(a, b) ) ); 
+                break;
+            }
 
             case OP_NOT:
                 *(vm.stackTop-1) = (BOOL_VAL(isFalsey(*(vm.stackTop-1))));
