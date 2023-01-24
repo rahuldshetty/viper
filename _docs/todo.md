@@ -15,8 +15,6 @@ Come up with something more efficient. Do you think the additional complexity is
 
 5) Run-length encoding for lines
 
-6) Ternary Operator
-
 7) multiple compilers running in parallel
 
 8) Optimization by OP_POPN if sequence of stack items to be removed
@@ -107,3 +105,5 @@ Make sure to think about scope. What should happen to local variables declared i
 0) Multi-line comments 
 
 26) BUG: File compilation requires end of file new-line to run. 
+
+6) Ternary Operator

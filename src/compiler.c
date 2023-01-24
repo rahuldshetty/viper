@@ -64,6 +64,7 @@ typedef struct{
 typedef enum {
   PREC_NONE,
   PREC_ASSIGNMENT,  // =
+  PREC_TERNARY,     // ?:
   PREC_OR,          // or
   PREC_AND,         // and
   PREC_EQUALITY,    // == !=
@@ -92,6 +93,7 @@ void number_constant(bool canAssign);
 void unary(bool canAssign);
 void grouping(bool canAssign);
 void binary(bool canAssign);
+void ternary(bool);
 void variable(bool canAssign);
 void literal(bool canAssign);
 void list_literal(bool);
@@ -116,6 +118,7 @@ ParseRule rules[] = {
   [TOKEN_MINUS]         = {unary,    binary, PREC_TERM},
   [TOKEN_ADD]           = {NULL,     binary, PREC_TERM},
   [TOKEN_SEMICOLON]     = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_QUESTION]      = {NULL,     ternary,   PREC_TERNARY},
   [TOKEN_DIVIDE]        = {NULL,     binary, PREC_FACTOR},
   [TOKEN_MULTIPLY]      = {NULL,     binary, PREC_FACTOR},
   [TOKEN_MOD]           = {NULL,     binary, PREC_FACTOR},
@@ -554,6 +557,26 @@ void string_constant(bool canAssign){
             copyString(parser.previous.start + 1, parser.previous.length - 2)
         )
     );
+}
+
+void ternary(bool canAssign){
+    // Similar to if-then/else statement but instead of executing statement, we look for expression values
+    int thenJump = emitJump(OP_JUMP_IF_FALSE);
+    emitByte(OP_POP);
+    expression();
+
+    int elseJump = emitJump(OP_JUMP);
+
+    patchJump(thenJump);
+    emitByte(OP_POP); // Discared condition values
+
+    consume(TOKEN_COLON, "Expected ':' separator.");
+
+    expression();
+
+    patchJump(elseJump);
+
+    match_parser(TOKEN_SEMICOLON);
 }
 
 void unary(bool canAssign){

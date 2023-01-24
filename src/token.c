@@ -41,6 +41,7 @@ Token scanToken(){
         case '*': return makeToken(TOKEN_MULTIPLY);
         case '%': return makeToken(TOKEN_MOD);
         case ':': return makeToken(TOKEN_COLON);
+        case '?': return makeToken(TOKEN_QUESTION);
 
         case '!':
             return makeToken(

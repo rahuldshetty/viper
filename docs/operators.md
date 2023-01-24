@@ -60,6 +60,7 @@ Viper supports mainly 4 types of operators.
 | String Equality == | Compares equality of two string objects. | "hello" == "Hello"  |
 | Print | Prints the value of given operand expression to stdout. | print "Hello" |
 | Call () | Used to invoke a function or create class objects. | myFunction(Person("John Doe", 26)) |
+| Ternary | This is a special form of conditional operator that is used to evaluate one of the two expression statement based on truth/false value of a condition. | result = (num % 2 == 0)? "even" : "odd" |
 
 ## Note
 
