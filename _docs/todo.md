@@ -10,11 +10,6 @@ Pick a keyword for a single-assignment variable form to add to Lox. Justify your
 
 Come up with something more efficient. Do you think the additional complexity is worth it?
 
-
-4) Long Constant Values
-
-5) Run-length encoding for lines
-
 7) multiple compilers running in parallel
 
 8) Optimization by OP_POPN if sequence of stack items to be removed
@@ -101,6 +96,8 @@ Make sure to think about scope. What should happen to local variables declared i
 
 
 # DONE:
+
+4) Long Constant Values
 
 0) Multi-line comments 
 

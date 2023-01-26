@@ -301,7 +301,8 @@ uint8_t makeConstant(Value value){
 }
 
 void emitConstant(Value value){
-    emitBytes(OP_CONSTANT, makeConstant(value));
+    // Support emitting large constant values
+    writeConstant(currentChunk(), value, parser.previous.line);
 }
 
 void patchJump(int offset){

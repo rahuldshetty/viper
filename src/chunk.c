@@ -40,5 +40,15 @@ int addConstant(Chunk* chunk, Value value){
 }
 
 void writeConstant(Chunk* chunk, Value value, int line) {
-    // TODO: Long Constant Values
+    int index = addConstant(chunk, value);
+    if(index < 256){
+        writeChunk(chunk, OP_CONSTANT, line);
+        writeChunk(chunk, (uint8_t)index, line);
+    } else {
+        // Little-endian format to store long constants
+        writeChunk(chunk, OP_CONSTANT_LONG, line);
+        writeChunk(chunk, (uint8_t)(index & 0xff), line);
+        writeChunk(chunk, (uint8_t)((index >> 8) & 0xff), line);
+        writeChunk(chunk, (uint8_t)((index >> 16) & 0xff), line);
+    }
 }
