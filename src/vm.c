@@ -471,10 +471,12 @@ InterpretResult run(){
             case OP_INVOKE:{
                 ObjString* method = READ_STRING();
                 int argCount = READ_BYTE();
+                frame->ip = ip;
                 if(!invoke(method, argCount)){
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 frame = &vm.frames[vm.frameCount - 1];
+                ip = frame->ip;
                 break;
             }
 
@@ -510,12 +512,14 @@ InterpretResult run(){
                 ObjString* method = READ_STRING();
                 int argCount = READ_BYTE();
                 ObjClass* superclass = AS_CLASS(pop());
-
+                
+                frame->ip = ip;
                 if(!invokeFromClass(superclass, method, argCount)){
                     return INTERPRET_RUNTIME_ERROR;
                 }
 
                 frame = &vm.frames[vm.frameCount - 1];
+                ip = frame->ip;
                 break;
             }
 
