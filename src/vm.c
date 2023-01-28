@@ -82,20 +82,22 @@ void freeVM(){
 
 InterpretResult run(){
     CallFrame* frame = &vm.frames[vm.frameCount - 1];
+    register uint8_t* ip = frame->ip;
     
-    #define READ_BYTE() (*frame->ip++)
+    #define READ_BYTE() (*ip++)
 
     #define READ_CONSTANT() ( frame->closure->function->chunk.constants.values[READ_BYTE()] )
 
     #define READ_STRING() AS_STRING(READ_CONSTANT())
 
     #define READ_SHORT() \
-        ( frame->ip += 2, (uint16_t)((frame->ip[-2] << 8 ) | frame->ip[-1] ))
+        ( ip += 2, (uint16_t)((ip[-2] << 8 ) | ip[-1] ))
 
     // TODO: Optimize inplace stack binary operation
     #define BINARY_OP(valueType, op) \
         do { \
             if(!IS_NUMBER(peek_stack(0)) || !IS_NUMBER(peek_stack(1))) { \
+                frame->ip = ip; \
                 runtimeError("Operand must be a number."); \
                 return INTERPRET_RUNTIME_ERROR; \
             }   \
@@ -151,6 +153,7 @@ InterpretResult run(){
                     double a = AS_NUMBER(pop());
                     push(NUMBER_VAL(a + b));
                 } else {
+                    frame->ip = ip;
                     runtimeError("Operands must be two numbers or two strings.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -163,6 +166,7 @@ InterpretResult run(){
                 double b = AS_NUMBER(pop());
                 double a = AS_NUMBER(pop());
                 if(b == 0){
+                    frame->ip = ip;
                     runtimeError("ZeroDivisionError: modulo by zero is invalid.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -177,6 +181,7 @@ InterpretResult run(){
             // Unary Operators
             case OP_NEGATE:         
                 if(!IS_NUMBER(peek_stack(0))){
+                    frame->ip = ip;
                     runtimeError("Operand must be a number.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -209,6 +214,7 @@ InterpretResult run(){
                 // Explicit declaration - users need to specify `var <identifier>` to declare variable
                 // if( tableSet(&vm.globals, name, peek_stack(0)) ){
                 //     tableDelete(&vm.globals, name);
+                //     frame->ip = ip;
                 //     runtimeError("Undefined variable '%s'.", name->chars);
                 //     return INTERPRET_RUNTIME_ERROR;
                 // }
@@ -220,6 +226,7 @@ InterpretResult run(){
                 Value value;
 
                 if(!tableGet(&vm.globals, name, &value)){
+                    frame->ip = ip;
                     runtimeError("Undefined variable '%s'.", name->chars);
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -254,28 +261,30 @@ InterpretResult run(){
 
             case OP_JUMP_IF_FALSE: {
                 uint16_t offset = READ_SHORT();
-                if(isFalsey(peek_stack(0))) frame->ip += offset;
+                if(isFalsey(peek_stack(0))) ip += offset;
                 break;
             }
 
             case OP_JUMP: {
                 uint16_t offset = READ_SHORT();
-                frame->ip += offset;
+                ip += offset;
                 break;
             }
 
             case OP_LOOP: {
                 uint16_t offset = READ_SHORT();
-                frame->ip -= offset;
+                ip -= offset;
                 break;
             }
 
             case OP_CALL:{
                 int argCount = READ_BYTE();
+                frame->ip = ip;
                 if(!callValue(peek_stack(argCount), argCount)){
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 frame = &vm.frames[vm.frameCount - 1];
+                ip = frame->ip;
                 break;
             }
 
@@ -362,6 +371,7 @@ InterpretResult run(){
                 vm.stackTop = frame->slots;
                 push(result);
                 frame = &vm.frames[vm.frameCount - 1];
+                ip = frame->ip;
                 break;
             }
 
