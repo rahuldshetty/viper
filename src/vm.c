@@ -312,6 +312,7 @@ InterpretResult run(){
                 for(int i = itemCounts - 1; i >= 0; i = i - 1){
                     // Check item type of key
                     if(!IS_STRING(peek_stack(2*i + 1)) && !IS_NUMBER(peek_stack(2*i + 1))){
+                        frame->ip = ip;
                         runtimeError("Map keys must be string or number type.");
                         return INTERPRET_RUNTIME_ERROR;
                     }
@@ -408,6 +409,7 @@ InterpretResult run(){
 
             case OP_GET_PROPERTY:{
                 if(!IS_INSTANCE(peek_stack(0)) && !IS_LIST(peek_stack(0))){
+                    frame->ip = ip;
                     runtimeError("Only instances have property.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -439,6 +441,7 @@ InterpretResult run(){
                         push(value);
                         break;
                     } else {
+                        frame->ip = ip;
                         runtimeError("List method '%s' not found.", name->chars);
                         return INTERPRET_RUNTIME_ERROR;
                     }
@@ -447,6 +450,7 @@ InterpretResult run(){
 
             case OP_SET_PROPERTY:{
                 if(!IS_INSTANCE(peek_stack(1))){
+                    frame->ip = ip;
                     runtimeError("Only instances have fields.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -477,6 +481,7 @@ InterpretResult run(){
             case OP_INHERIT:{
                 Value superclass = peek_stack(1);
                 if(!IS_CLASS(superclass)){
+                    frame->ip = ip;
                     runtimeError("Superclass must be a class.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -599,14 +604,21 @@ bool callFn(ObjClosure* closure, int argCount){
 bool callNativeObjMethod(Value self, Value callee, int argCount){
     ObjNative* obj = AS_NATIVE_OBJ(callee);
     NativeObjFn native = obj->function.objMethod;
-    Value result = native(
-        argCount,
-        self,
-        vm.stackTop - argCount
-    );
-    vm.stackTop -= argCount + 1;
-    push(result);
-    return true;
+    if(native(argCount, self, vm.stackTop - argCount)){
+        vm.stackTop -= argCount;
+        return true;
+    } else {
+        runtimeError(AS_STRING(vm.stackTop[- argCount - 1])->chars);
+        return false;
+    }
+    // Value result = native(
+    //     argCount,
+    //     self,
+    //     vm.stackTop - argCount
+    // );
+    // vm.stackTop -= argCount + 1;
+    // push(result);
+    // return true;
 }
 
 bool callValue(Value callee, int argCount){
@@ -623,9 +635,13 @@ bool callValue(Value callee, int argCount){
                 switch(obj->type){
                     case NATIVE_METHOD: {
                         NativeFn native = obj->function.method;
-                        Value result = native(argCount, vm.stackTop - argCount);
-                        vm.stackTop -= argCount + 1;
-                        push(result);
+                        if(native(argCount, vm.stackTop - argCount)){
+                            vm.stackTop -= argCount;
+                            return true;
+                        } else {
+                            runtimeError(AS_STRING(vm.stackTop[- argCount - 1])->chars);
+                            return false;
+                        }
                         return true;
                     }
 

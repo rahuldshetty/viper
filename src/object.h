@@ -113,8 +113,8 @@ typedef struct{
     MapEntry* entries;
 } ObjMap;
 
-typedef Value (*NativeFn)(int argCount, Value* args);
-typedef Value (*NativeObjFn)(int argCount, Value obj, Value* args);
+typedef bool (*NativeFn)(int argCount, Value* args);
+typedef bool (*NativeObjFn)(int argCount, Value obj, Value* args);
 
 typedef enum {
     NATIVE_METHOD,     // called directly - len, str
