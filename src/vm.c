@@ -300,7 +300,6 @@ InterpretResult run(){
                     writeValueArray(&reversedList->array, list->array.values[i]);
                 }
 
-                FREE(ObjList, list);
                 push(OBJ_VAL(reversedList));
                 break;
             }
