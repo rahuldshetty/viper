@@ -1,6 +1,6 @@
-![logo](_media/logo_m.png)
+<img src="_media/logo.png" width="200">
 
-# Viper, it Bytes <small>1.0</small>
+<!-- # Viper, it Bytes <small>1.0</small> -->
 
 > *"Viper, it Bytes"* (pun intended) is a dynamically-typed, byte-interpreted programming language written in C.
 
