@@ -523,6 +523,11 @@ InterpretResult run(){
                 break;
             }
 
+            case OP_DUP: {
+                push(peek_stack(0));
+                break;
+            }
+
             
         }
     }

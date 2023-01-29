@@ -891,6 +891,8 @@ void statement(){
         breakStatement();
     } else if(match_parser(TOKEN_CONTINUE)){
         continueStatement();
+    } else if(match_parser(TOKEN_SWITCH)){
+        switchStatement();
     }
     else {
         expressionStatement();
@@ -1011,13 +1013,87 @@ void forStatement(){
     endScope();
 }
 
+// TODO
 void breakStatement(){
     match_parser(TOKEN_SEMICOLON);
 }
 
+// TODO
 void continueStatement(){
     
     match_parser(TOKEN_SEMICOLON);
+}
+
+void switchStatement(){
+    bool paranFound = match_parser(TOKEN_LEFT_PAREN);
+    expression();
+    if(paranFound){
+        consume(TOKEN_RIGHT_PAREN, "Expected ')' for switch condition.");
+    }
+    
+    consume(TOKEN_LEFT_BRACE, "Expected '{' before switch cases.");
+
+    int state = 0; // 0: before all cases, 1: before default, 2: after default
+    int caseEnds[MAX_SWITCH_CASES];
+    int caseCount = 0;
+    int previousCaseSkip = -1;
+
+    while(!match_parser(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)){
+        if(match_parser(TOKEN_CASE) || match_parser(TOKEN_DEFAULT)){
+            TokenType caseType = parser.previous.type;
+
+            if(state == 2){
+                error("Can't have another case or default after the default case.");
+            }
+
+            if(state == 1){
+                // at end of previous casse, jump over others
+                caseEnds[caseCount++] = emitJump(OP_JUMP);
+
+                // patch its condition to jump to the next case (current case)
+                patchJump(previousCaseSkip);
+                emitByte(OP_POP);
+            }
+
+            if(caseType == TOKEN_CASE){
+                state = 1;
+
+                // See if the case is equal to the value
+                emitByte(OP_DUP);
+                expression();
+
+                consume(TOKEN_COLON, "Expected ':' after case value.");
+
+                emitByte(OP_EQUAL);
+                previousCaseSkip = emitJump(OP_JUMP_IF_FALSE);
+
+                // pop comparison result
+                emitByte(OP_POP);
+            } else {
+                state = 2;
+                consume(TOKEN_COLON, "Expected ':' after default.");
+                previousCaseSkip = -1;
+            }
+        } else {
+            if(state == 0){
+                error("Can't have statements before any case.");
+            }
+            statement();
+        }
+    }
+    
+    // If ended without default case, then patch its jump
+    if(state==1){
+        patchJump(previousCaseSkip);
+        emitByte(OP_POP);
+    }
+
+    // Patch all jump to the end.
+    for(int i = 0; i < caseCount; i++){
+        patchJump(caseEnds[i]);
+    }
+    
+    emitByte(OP_POP);
 }
 
 void expressionStatement(){

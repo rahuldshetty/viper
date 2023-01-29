@@ -1,7 +1,5 @@
 # TODO:
 
-1) Extend `clox` to allow more than 256 local variables to be in scope at a time.
-
 2) Many languages make a distinction between variables that can be reassigned and those that can’t. In Java, the final modifier prevents you from assigning to a variable. In JavaScript, a variable declared with let can be assigned, but one declared using `const` can’t. Swift treats let as single-assignment and uses `var` for assignable variables. Scala and `Kotlin` use `val` and var.
 
 Pick a keyword for a single-assignment variable form to add to Lox. Justify your choice, then implement it. An attempt to assign to a variable declared using your new keyword should cause a compile error.
@@ -17,8 +15,6 @@ Come up with something more efficient. Do you think the additional complexity is
 9)  Tunable parameter - pick best
 
 10) String interpolation ${}
-11) Contextual Keywords - `async, await`, 
-12) Optimize in-place stack binary operation
 
 13)  The compiler adds a global variable’s name to the constant table as a 
 string every time an identifier is encountered. 
@@ -37,14 +33,6 @@ each time it is used is pretty slow, even with a good hash table.
  way to store and access global variables without changing the semantics?
 
 15) Dynamically grow Stack
-
-16) Add support for Switch Construct
-
-switch-Statement     → "switch" "(" expression ")"
-                 "{" switchCase* defaultCase? "}" ;
-switchCase     → "case" expression ":" statement* ;
-defaultCase    → "default" ":" statement* ;
-To execute a switch statement, first evaluate the parenthesized switch value expression. Then walk the cases. For each case, evaluate its value expression. If the case value is equal to the switch value, execute the statements under the case and then exit the switch statement. Otherwise, try the next case. If no case matches and there is a default clause, execute its statements.
 
 21) Wrapping every ObjFunction in an ObjClosure introduces a level of indirection that has a performance cost. That cost isn’t necessary for functions that do not close over any variables, but it does let the runtime treat all calls uniformly.
 
@@ -82,6 +70,14 @@ A continue statement jumps directly to the top of the nearest enclosing loop, sk
 
 Make sure to think about scope. What should happen to local variables declared inside the body of the loop or in blocks nested inside the loop when a continue is executed?
 
+
+16) Add support for Switch Construct
+
+switch-Statement     → "switch" "(" expression ")"
+                 "{" switchCase* defaultCase? "}" ;
+switchCase     → "case" expression ":" statement* ;
+defaultCase    → "default" ":" statement* ;
+To execute a switch statement, first evaluate the parenthesized switch value expression. Then walk the cases. For each case, evaluate its value expression. If the case value is equal to the switch value, execute the statements under the case and then exit the switch statement. Otherwise, try the next case. If no case matches and there is a default clause, execute its statements.
 
 # DONE:
 

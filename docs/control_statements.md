@@ -10,7 +10,7 @@ Viper supports two main types of control statements:
 
 These statement let you control whether a block of code has to be executed or not based on some decision/condition.
 
-### If-Else State
+### If-Else Statements
 
 The most basic form of control statement is the if-else statements. These let you control whether a piece of code called as "if-block" has to be executed based on condition. In case the condition fails, we can have an optional block of statement that can be triggered which is called "else-block".
 
@@ -46,6 +46,47 @@ if  number >= 10   {
 Output
 ```
 Number greater than or equal 10
+```
+
+
+### Switch statement
+
+This is a special form of if/else ladder where you have one condition expression with multiple case branches. Based on the value of condition only one of the case statement is taken for execution. 
+
+- You can have a default case statement which will be selected when none of the switch cases are selected.
+- Case statement has its own block level scoping.
+
+Syntax:
+```
+switch <case-condition> {
+    case <possible-case-value-1>: <case-statement1>
+    case <possible-case-value-2>: <case-statement2>
+    .
+    .
+    .
+    case <possible-case-value-n>: <case-statementN>
+    default: <default-case-statement>
+}
+
+```
+
+#### Example:
+
+```switch.viper
+i = 1
+switch i {
+    case 1: {
+        print "one"
+    }
+    case 2: print "two"
+    case 3: print "three"
+    default: print "default"
+}
+```
+
+Output
+```
+one
 ```
 
 ## Loop Statements

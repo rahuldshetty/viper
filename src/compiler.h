@@ -4,6 +4,8 @@
 #include "chunk.h"
 #include "object.h"
 
+#define MAX_SWITCH_CASES 256
+
 ObjFunction* compile(const char* source);
 
 void expression();
@@ -28,6 +30,7 @@ void printStatement();
 void expressionStatement();
 void breakStatement();
 void continueStatement();
+void switchStatement();
 
 void ifStatement();
 void whileStatement();

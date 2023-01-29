@@ -49,6 +49,7 @@ typedef enum {
     OP_MAP,
     OP_INDEX,
     OP_SET_INDEX,
+    OP_DUP,
 } OpCode;
 
 
