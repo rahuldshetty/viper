@@ -10,7 +10,6 @@
 #define FRAMES_MAX 64
 #define STACK_MAX ( FRAMES_MAX * UINT8_COUNT )
 
-
 typedef struct{
     ObjClosure* closure;
     uint8_t* ip;
@@ -22,7 +21,9 @@ typedef struct {
     int frameCount;
 
     Value stack[STACK_MAX]; // TODO: dynamically grow Stack
+    // Value* stack;
     Value* stackTop;
+    size_t stackCapacity;
     Table globals;  // global variables
     Table strings;
     Table constants; // global constants
@@ -36,6 +37,8 @@ typedef struct {
     int grayCount;
     int grayCapacity;
     Obj** grayStack;
+
+    bool inited;
 } VM;
 
 VM vm;

@@ -14,6 +14,13 @@
 #include "vm.h"
 
 void initVM(){
+    if(vm.inited){
+        return;
+    }
+
+    // vm.stack = NULL;
+    vm.stackCapacity = 0;
+
     resetStack();
     vm.objects = NULL;
 
@@ -28,6 +35,7 @@ void initVM(){
     initTable(&vm.strings);
     initTable(&vm.constants);
 
+    vm.inited = true;
     registerBuiltInFunctions();
 }
 
@@ -65,18 +73,27 @@ void runtimeError(const char* format, ...){
 
 // Foreign Function Interface
 void defineNative(const char* name, NativeFn function){
-    push(OBJ_VAL(copyString(name, (int)strlen(name))));
-    push(OBJ_VAL(newNative(function)));
-    tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
+    ObjString* string = copyString(name, (int)strlen(name));
+    ObjNative* native = newNative(function);
+    push(OBJ_VAL(string));
+    push(OBJ_VAL(native));
+    tableSet(&vm.globals, string, OBJ_VAL(native));
     pop();
     pop();
 }
 
 
 void freeVM(){
+    if(!vm.inited){
+        return;
+    }
+
+    // debugPls("freeVM");
+
     freeTable(&vm.globals);
     freeTable(&vm.strings);
     freeTable(&vm.constants);
+
     freeObjects();
 }
 
@@ -551,6 +568,14 @@ InterpretResult interpret(const char* source){
 }
 
 void push(Value value){
+    size_t count = vm.stackTop - vm.stack;
+    // if(count == vm.stackCapacity){
+    //     size_t oldCapacity = vm.stackCapacity;
+    //     vm.stackCapacity = GROW_CAPACITY(oldCapacity);
+    //     vm.stack = GROW_ARRAY(Value, vm.stack, oldCapacity, vm.stackCapacity);
+    //     vm.stackTop = vm.stack + count;
+    // }
+
     *vm.stackTop = value;
     vm.stackTop++;
 }

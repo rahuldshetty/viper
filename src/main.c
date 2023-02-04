@@ -64,7 +64,9 @@ void runFile(const char* path){
 
 int main(int argc, const char* argv[]){
     initVM();
-
+    
+    // runFile("examples/functions/function.viper");
+    //runFile("examples/functions/built_in_function.viper");
     if (argc == 1){
         repl();
     } else if(argc == 2){
