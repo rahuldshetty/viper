@@ -5,3 +5,6 @@ cmake-win/
 release/
 cmake/*
 !cmake/CMakeLists.txt
+
+dev.txt
+wasm/
