@@ -88,8 +88,6 @@ void freeVM(){
         return;
     }
 
-    // debugPls("freeVM");
-
     freeTable(&vm.globals);
     freeTable(&vm.strings);
     freeTable(&vm.constants);
