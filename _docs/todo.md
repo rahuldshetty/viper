@@ -32,8 +32,6 @@ each time it is used is pretty slow, even with a good hash table.
  Can you come up with a more efficient
  way to store and access global variables without changing the semantics?
 
-15) Dynamically grow Stack
-
 21) Wrapping every ObjFunction in an ObjClosure introduces a level of indirection that has a performance cost. That cost isn’t necessary for functions that do not close over any variables, but it does let the runtime treat all calls uniformly.
 
 Change clox to only wrap functions in ObjClosures that need upvalues. How does the code complexity and performance compare to always wrapping functions? Take care to benchmark programs that do and do not use closures. How should you weight the importance of each benchmark? If one gets slower and one faster, how do you decide what trade-off to make to choose an implementation strategy?
@@ -101,3 +99,5 @@ switch-Statement     → "switch" "(" expression ")"
 switchCase     → "case" expression ":" statement* ;
 defaultCase    → "default" ":" statement* ;
 To execute a switch statement, first evaluate the parenthesized switch value expression. Then walk the cases. For each case, evaluate its value expression. If the case value is equal to the switch value, execute the statements under the case and then exit the switch statement. Otherwise, try the next case. If no case matches and there is a default clause, execute its statements.
+
+15) Dynamically grow Stack
