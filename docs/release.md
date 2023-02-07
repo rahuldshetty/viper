@@ -4,6 +4,7 @@
 
 - Dynamic growing value stack for real-time production application of Viper language.
 - Support for switch branching statements.
+- Modulo Operator
 - 
 
 ## Alpha: 1.0
