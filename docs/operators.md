@@ -6,14 +6,18 @@ Operators are special symbol(s) reserved in Viper to perform actions to generate
 
 Viper supports mainly 4 types of operators.
  
-### Unary Operators
+## Unary Operators
 
-- These operators work with single operand value.
+These operators work with single operand value.
 
 | Operator | Description | Example |
 | ------ | ----------- | ----------- |
 | Unary Not ! | Negate Boolean value from True to False or vice versa. | !true |
 | Unary Minus - | Number is multiplied by -1 to get negative value. | -1 |
+
+## Binary Operators
+
+Binary operators accept two operand values to compute results. Arithmetic and Conditional operators belongs to this class of operator.
 
 ### Arithmetic Operators
 
@@ -51,7 +55,7 @@ Viper supports mainly 4 types of operators.
 | Logical And | Compares whether two conditional expressions are true. | true and true |
 | Logical Or | Compares whether either of the two conditional expressions are true. | false or true |
 
-### Special Operators
+## Special Operators
 
 | Operator | Description | Example |
 | ------ | ----------- | ----------- |

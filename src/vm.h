@@ -20,8 +20,8 @@ typedef struct {
     CallFrame frames[FRAMES_MAX];
     int frameCount;
 
-    Value stack[STACK_MAX]; // TODO: dynamically grow Stack
-    // Value* stack;
+    //Value stack[STACK_MAX]; 
+    Value* stack; // dynamically grow Stack
     Value* stackTop;
     size_t stackCapacity;
     Table globals;  // global variables

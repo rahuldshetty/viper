@@ -18,7 +18,7 @@ void initVM(){
         return;
     }
 
-    // vm.stack = NULL;
+    vm.stack = NULL;
     vm.stackCapacity = 0;
 
     resetStack();
@@ -567,12 +567,27 @@ InterpretResult interpret(const char* source){
 
 void push(Value value){
     size_t count = vm.stackTop - vm.stack;
-    // if(count == vm.stackCapacity){
-    //     size_t oldCapacity = vm.stackCapacity;
-    //     vm.stackCapacity = GROW_CAPACITY(oldCapacity);
-    //     vm.stack = GROW_ARRAY(Value, vm.stack, oldCapacity, vm.stackCapacity);
-    //     vm.stackTop = vm.stack + count;
-    // }
+    if(count == vm.stackCapacity){
+        Value *oldStack = vm.stack;
+
+        size_t oldCapacity = vm.stackCapacity;
+        vm.stackCapacity = GROW_CAPACITY(oldCapacity);
+        vm.stack = GROW_ARRAY(Value, vm.stack, oldCapacity, vm.stackCapacity);
+        vm.stackTop = vm.stack + count;
+
+        // Ref: https://github.com/lazara5/elox/blob/master/elox/lib/vm.c#L296
+        // the stack moved, recalculate all pointers that point to the old stack
+        if(oldStack != vm.stack){
+            for(int i = 0; i < vm.frameCount; i++){
+                CallFrame* frame = &vm.frames[i];
+                frame->slots = vm.stack + (frame->slots - oldStack);
+            }
+
+            for(ObjUpvalue* upvalue = vm.openUpvalues; upvalue != NULL; upvalue = upvalue->next){
+                upvalue->location = vm.stack + (upvalue->location - oldStack);
+            }
+        }
+    }
 
     *vm.stackTop = value;
     vm.stackTop++;

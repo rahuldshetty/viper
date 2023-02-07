@@ -70,15 +70,6 @@ A continue statement jumps directly to the top of the nearest enclosing loop, sk
 
 Make sure to think about scope. What should happen to local variables declared inside the body of the loop or in blocks nested inside the loop when a continue is executed?
 
-
-16) Add support for Switch Construct
-
-switch-Statement     → "switch" "(" expression ")"
-                 "{" switchCase* defaultCase? "}" ;
-switchCase     → "case" expression ":" statement* ;
-defaultCase    → "default" ":" statement* ;
-To execute a switch statement, first evaluate the parenthesized switch value expression. Then walk the cases. For each case, evaluate its value expression. If the case value is equal to the switch value, execute the statements under the case and then exit the switch statement. Otherwise, try the next case. If no case matches and there is a default clause, execute its statements.
-
 # DONE:
 
 4) Long Constant Values
@@ -100,3 +91,13 @@ This does mean we need to be careful to load and store the local ip back into th
 20) Right now, there’s no way for a native function to signal a runtime error. In a real implementation, this is something we’d need to support because native functions live in the statically typed world of C but are called from dynamically typed Lox land. If a user, say, tries to pass a string to sqrt(), that native function needs to report a runtime error.
 
 Extend the native function system to support that. How does this capability affect the performance of native calls?
+
+
+
+16) Add support for Switch Construct
+
+switch-Statement     → "switch" "(" expression ")"
+                 "{" switchCase* defaultCase? "}" ;
+switchCase     → "case" expression ":" statement* ;
+defaultCase    → "default" ":" statement* ;
+To execute a switch statement, first evaluate the parenthesized switch value expression. Then walk the cases. For each case, evaluate its value expression. If the case value is equal to the switch value, execute the statements under the case and then exit the switch statement. Otherwise, try the next case. If no case matches and there is a default clause, execute its statements.
