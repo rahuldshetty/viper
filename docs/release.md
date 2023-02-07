@@ -5,7 +5,7 @@
 - Dynamic growing value stack for real-time production application of Viper language.
 - Support for switch branching statements.
 - Modulo Operator
-- 
+- Single quoted string datatype.
 
 ## Alpha: 1.0
 
