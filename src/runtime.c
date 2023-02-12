@@ -14,3 +14,14 @@ ObjNative* addNativeObjMethod(Table* method, const char* name, NativeObjFn func)
     tableSet(method, mname, OBJ_VAL(natFn));
     return natFn;
 }
+
+bool IsNativeMethodSupported(Value obj){
+    if(
+        IS_LIST(obj) ||
+        IS_FILE(obj)
+    ){
+        return true;
+    }
+
+    return false;
+}

@@ -107,6 +107,15 @@ void freeObject(Obj* object){
             break;
         }
 
+        case OBJ_FILE:{
+            ObjFile* file = (ObjFile*)object;
+            // FREE_ARRAY(char, file->mode->chars, file->mode->length + 1);
+            // FREE_ARRAY(char, file->path->chars, file->path->length + 1);
+            freeTable(&file->nativeMethods);
+            FREE(ObjFile, object);
+            break;
+        }
+
     }
 }
 

@@ -1,6 +1,9 @@
 #ifndef viper_object_h
 #define viper_object_h
 
+#include <stdio.h>
+#include <stdbool.h>
+
 #include "common.h"
 #include "chunk.h"
 #include "table.h"
@@ -17,6 +20,7 @@
 #define IS_BOUND_METHOD(value) isObjType(value, OBJ_BOUND_METHOD)
 #define IS_LIST(value) isObjType(value, OBJ_LIST)
 #define IS_MAP(value) isObjType(value, OBJ_MAP)
+#define IS_FILE(value) isObjType(value, OBJ_FILE)
 
 #define AS_STRING(value) (((ObjString*)AS_OBJ(value)))
 #define AS_CSTRING(value) (((ObjString*)AS_OBJ(value))->chars)
@@ -29,6 +33,7 @@
 #define AS_BOUND_METHOD(value) ((ObjBoundMethod*)AS_OBJ(value))
 #define AS_LIST(value) ((ObjList*)AS_OBJ(value))
 #define AS_MAP(value) ((ObjMap*)AS_OBJ(value))
+#define AS_FILE(value) ((ObjFile*)AS_OBJ(value))
 
 typedef enum {
     OBJ_STRING,
@@ -40,6 +45,7 @@ typedef enum {
     OBJ_BOUND_METHOD,
     OBJ_LIST,
     OBJ_MAP,
+    OBJ_FILE,
 } ObjType;
 
 struct Obj {
@@ -113,6 +119,15 @@ typedef struct{
     MapEntry* entries;
 } ObjMap;
 
+typedef struct {
+    Obj obj;
+    bool isOpen;
+    FILE *file;
+    ObjString* mode;
+    ObjString* path;
+    Table nativeMethods;
+} ObjFile;
+
 typedef bool (*NativeFn)(int argCount, Value* args);
 typedef bool (*NativeObjFn)(int argCount, Value obj, Value* args);
 
@@ -149,6 +164,8 @@ ObjInstance* newInstance(ObjClass* klass);
 ObjBoundMethod* newBoundMethod(Value receiver, ObjClosure* method);
 ObjList* newList();
 ObjMap* newMap();
+
+ObjFile* newFile(ObjString* path, ObjString* mode);
 
 ObjString* strObject(Value obj);
 

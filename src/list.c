@@ -6,7 +6,7 @@
 #include "table.h"
 #include "value.h"
 
-bool append(int argCount, Value self, Value* args){
+bool appendList(int argCount, Value self, Value* args){
     if(argCount != 1){
         args[-1] = errorOutput("Expected 1 argument to push method.");
         return false;
@@ -19,7 +19,7 @@ bool append(int argCount, Value self, Value* args){
     return true;
 }
 
-bool remove(int argCount, Value self, Value* args){
+bool removeList(int argCount, Value self, Value* args){
     ObjList* list = AS_LIST(self);
     if(list->array.count != 0){
         if(argCount != 1){
@@ -63,7 +63,7 @@ bool remove(int argCount, Value self, Value* args){
 }
 
 void initListNativeMethods(ObjList* list){
-    addNativeObjMethod(&list->nativeMethods, "push", append);
-    addNativeObjMethod(&list->nativeMethods, "pop", remove);
+    addNativeObjMethod(&list->nativeMethods, "push", appendList);
+    addNativeObjMethod(&list->nativeMethods, "pop", removeList);
 }
 

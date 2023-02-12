@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "file.h"
 #include "list.h"
 #include "memory.h"
 #include "map.h"
@@ -171,6 +172,17 @@ void printObject(Value value){
             break;
         }
 
+        case OBJ_FILE:{
+            ObjFile* file = AS_FILE(value);
+            printf(
+                "<file path:'%s' mode:'%s' %s>", \
+                file->path->chars,
+                file->mode->chars,
+                file->isOpen? "active" : "not-active"
+            );
+            break;
+        }
+
     }
 }
 
@@ -263,6 +275,16 @@ ObjMap* newMap(){
     ObjMap* map = ALLOCATE_OBJ(ObjMap, OBJ_MAP);
     initMap(map);
     return map;
+}
+
+ObjFile* newFile(ObjString* path, ObjString* mode){
+    ObjFile* file = ALLOCATE_OBJ(ObjFile, OBJ_FILE);
+    initTable(&file->nativeMethods);
+    initFileNativeMethods(file);
+    file->mode = mode;
+    file->path = path;
+    file->isOpen = false;
+    return file;
 }
 
 // Format string as <$tag '$name'>

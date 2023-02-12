@@ -10,6 +10,7 @@
 #include "map.h"
 #include "memory.h"
 #include "object.h"
+#include "runtime.h"
 #include "value.h"
 #include "vm.h"
 
@@ -800,7 +801,7 @@ bool invokeFromClass(ObjClass* klass, ObjString* name, int argCount){
 bool invoke(ObjString* name, int argCount){
     Value receiver = peek_stack(argCount);
 
-    if(!IS_INSTANCE(receiver) && !IS_LIST(receiver)){
+    if(!IS_INSTANCE(receiver) && !IsNativeMethodSupported(receiver)){
         runtimeError("Only instances & native objects have methods.");
         return false;
     }
@@ -826,6 +827,18 @@ bool invoke(ObjString* name, int argCount){
             return callNativeObjMethod(receiver, method, argCount);
         } else {
             runtimeError("List method '%s' not found.", name->chars);
+            return false;
+        }
+    }
+    // File method call
+    else if(IS_FILE(receiver)){
+        ObjFile* file = AS_FILE(receiver);
+        Value method;
+        if(tableGet(&file->nativeMethods, name, &method)){
+            vm.stackTop[-argCount-1] = method;
+            return callNativeObjMethod(receiver, method, argCount);
+        } else {
+            runtimeError("File method '%s' not found.", name->chars);
             return false;
         }
     }

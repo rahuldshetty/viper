@@ -22,6 +22,7 @@ set(VIPER_LIB_HEADERS
     ${SRC_DIR}/common.h
     ${SRC_DIR}/compiler.h
     ${SRC_DIR}/debug.h
+    ${SRC_DIR}/file.h
     ${SRC_DIR}/list.h
     ${SRC_DIR}/map.h
     ${SRC_DIR}/memory.h
@@ -40,6 +41,7 @@ set(VIPER_LIB_SOURCES
 	${SRC_DIR}/chunk.c
     ${SRC_DIR}/compiler.c
     ${SRC_DIR}/debug.c
+    ${SRC_DIR}/file.c
     ${SRC_DIR}/list.c
     ${SRC_DIR}/map.c
     ${SRC_DIR}/memory.c
