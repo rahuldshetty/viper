@@ -123,14 +123,19 @@ ParseRule rules[] = {
   [TOKEN_MULTIPLY]      = {NULL,     binary, PREC_FACTOR},
   [TOKEN_MOD]           = {NULL,     binary, PREC_FACTOR},
   [TOKEN_NOT]           = {unary,    NULL,   PREC_NONE},
-  [TOKEN_NOT_EQUAL]     = {NULL,     binary, PREC_EQUALITY},
-  [TOKEN_EQUAL]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_NOT_EQUAL]     = {NULL,     binary,   PREC_EQUALITY},
+  [TOKEN_EQUAL]         = {NULL,     NULL,     PREC_NONE},
+  [TOKEN_ADD_EQUAL]     = {NULL,     binary,   PREC_NONE},
+  [TOKEN_MINUS_EQUAL]   = {NULL,     binary,   PREC_NONE},
+  [TOKEN_MULTIPLY_EQUAL]= {NULL,     binary,   PREC_NONE},
+  [TOKEN_DIVIDE_EQUAL]  = {NULL,     binary,   PREC_NONE},
+  [TOKEN_MOD_EQUAL]     = {NULL,     binary,   PREC_NONE},
   [TOKEN_EQUAL_EQUAL]   = {NULL,     binary,   PREC_EQUALITY},
   [TOKEN_GREATER]       = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_GREATER_EQUAL] = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS]          = {NULL,     binary,   PREC_COMPARISON},
   [TOKEN_LESS_EQUAL]    = {NULL,     binary,   PREC_COMPARISON},
-  [TOKEN_IDENTIFIER]    = {variable,     NULL,   PREC_NONE},
+  [TOKEN_IDENTIFIER]    = {variable, NULL,     PREC_NONE},
   [TOKEN_STRING]        = {string_constant,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {number_constant,   NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     and_,   PREC_AND},
@@ -828,6 +833,13 @@ void call(bool canAsign){
     emitBytes(OP_CALL, argCount);
 }
 
+void emitShorthandAssign(uint8_t getOp, uint8_t setOp, OpCode op, uint8_t args){
+    emitBytes(getOp, args);
+    expression();
+    emitByte(op);
+    emitBytes(setOp, args);
+}
+
 
 // Identifer named vairiable access
 void namedVariable(Token name, bool canAssign){
@@ -850,7 +862,18 @@ void namedVariable(Token name, bool canAssign){
     if(canAssign && match_parser(TOKEN_EQUAL)){
         expression();
         emitBytes(setOp, (uint8_t) arg);
-    } else {
+    } else if(canAssign && match_parser(TOKEN_ADD_EQUAL)){
+        emitShorthandAssign(getOp, setOp, OP_ADD, (uint8_t) arg);
+    } else if(canAssign && match_parser(TOKEN_MINUS_EQUAL)){
+        emitShorthandAssign(getOp, setOp, OP_MINUS, (uint8_t) arg);
+    } else if(canAssign && match_parser(TOKEN_MULTIPLY_EQUAL)){
+        emitShorthandAssign(getOp, setOp, OP_MULTIPLY, (uint8_t) arg);
+    } else if(canAssign && match_parser(TOKEN_DIVIDE_EQUAL)){
+        emitShorthandAssign(getOp, setOp, OP_DIVIDE, (uint8_t) arg);
+    } else if(canAssign && match_parser(TOKEN_MOD_EQUAL)){
+        emitShorthandAssign(getOp, setOp, OP_MOD, (uint8_t) arg);
+    }
+    else {
         emitBytes(getOp, (uint8_t) arg);
     }
 }

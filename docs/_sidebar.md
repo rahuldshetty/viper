@@ -15,4 +15,5 @@
     - [Constructors](oops/constructor.md)
     - [Inheritance](oops/inheritance.md)
 - [Viper Developer Guide](developer/intro.md)
+- [Release Notes](release.md)
 - [What's Next?](future.md)

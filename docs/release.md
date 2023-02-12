@@ -1,11 +1,12 @@
 # Release Notes <!-- {docsify-ignore-all} -->
 
-## Alpha: 1.1
+## Alpha: 1.1 [WIP]
 
 - Dynamic growing value stack for real-time production application of Viper language.
 - Support for switch branching statements.
 - Modulo Operator
 - Single quoted string datatype.
+- Shorthand expressions: += -= *= /= %=
 
 ## Alpha: 1.0
 

@@ -60,6 +60,7 @@ Binary operators accept two operand values to compute results. Arithmetic and Co
 | Operator | Description | Example |
 | ------ | ----------- | ----------- |
 | Assignment = | This operator is used to assign values to variables, list and map items.  | my_variable = 100 |
+| Shorthand Assignment +=,-=,*=,/=,%= | This is a special form of assignment operator that uses the target variable in the operator expression. The target variable need to be defined prior to this operation. | a += 100 |
 | String Concatenation + | Appends one string to the end of another string. | "hello" + " world!" |
 | String Equality == | Compares equality of two string objects. | "hello" == "Hello"  |
 | Print | Prints the value of given operand expression to stdout. | print "Hello" |

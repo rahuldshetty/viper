@@ -35,11 +35,31 @@ Token scanToken(){
         case ';': return makeToken(TOKEN_SEMICOLON);
         case ',': return makeToken(TOKEN_COMMA);
         case '.': return makeToken(TOKEN_DOT);
-        case '-': return makeToken(TOKEN_MINUS);
-        case '+': return makeToken(TOKEN_ADD);
-        case '/': return makeToken(TOKEN_DIVIDE);
-        case '*': return makeToken(TOKEN_MULTIPLY);
-        case '%': return makeToken(TOKEN_MOD);
+        case '-': return makeToken(
+            match('=') ?
+            TOKEN_MINUS_EQUAL:
+            TOKEN_MINUS
+        );
+        case '+': return makeToken(
+            match('=') ?
+            TOKEN_ADD_EQUAL:    
+            TOKEN_ADD
+        );
+        case '/': return makeToken(
+            match('=') ?
+            TOKEN_DIVIDE_EQUAL:
+            TOKEN_DIVIDE
+        );
+        case '*': return makeToken(
+            match('=') ? 
+            TOKEN_MULTIPLY_EQUAL:
+            TOKEN_MULTIPLY
+        );
+        case '%': return makeToken(
+            match('=') ?
+            TOKEN_MOD_EQUAL:
+            TOKEN_MOD
+        );
         case ':': return makeToken(TOKEN_COLON);
         case '?': return makeToken(TOKEN_QUESTION);
 
