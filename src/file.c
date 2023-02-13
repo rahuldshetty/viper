@@ -1,3 +1,4 @@
+#include <string.h>
 #include <sys/stat.h>
 
 #include "builtin.h"
@@ -14,9 +15,51 @@
 
 #endif /* ifdef _WIN32 */
 
-
 bool is_valid_mode(const char* mode){
 
+}
+
+
+void _file_open(ObjFile* file){
+    if(!file->isOpen){
+        char* mode = file->mode->chars;
+        file->file = fopen(file->path->chars, mode);
+        if(file->file != NULL)
+            file->isOpen = true;
+    }
+}
+
+int _file_close(ObjFile* file){
+    int result = -1;
+    if(file->isOpen){
+        fflush(file->file);
+        result = fclose(file->file);
+        file->file = NULL;
+        file->isOpen = false;
+    }
+    return result;
+}
+
+bool is_binary_mode(ObjFile* file){
+    return strstr(file->mode->chars, "b") != NULL;
+}
+
+// TODO: Binary file handling, checking readonly mode
+bool file_exists(int argCount, Value self, Value* args){
+    if(argCount != 0){
+        args[-1] = errorOutput("Expected 0 argument to read method.");
+        return false;
+    }
+
+    ObjFile* file = AS_FILE(self);
+    _file_open(file);
+
+    bool exists = file->isOpen;
+
+    _file_close(file);
+
+    args[-1] = BOOL_VAL(exists);
+    return true;
 }
 
 // TODO: Binary file handling, checking readonly mode
@@ -25,7 +68,10 @@ bool file_read(int argCount, Value self, Value* args){
         args[-1] = errorOutput("Expected 0 argument to read method.");
         return false;
     }
+
     ObjFile* file = AS_FILE(self);
+
+    _file_open(file);
 
     if(!file->isOpen){
         args[-1] = errorOutput("Unable to read file, make sure it is active before reading.");
@@ -66,8 +112,63 @@ bool file_read(int argCount, Value self, Value* args){
 
     if(buffer != NULL) buffer[bytes_read] = '\0';
 
-    args[-1] = OBJ_VAL(copyString(buffer, file_size + 1));
+    if(is_binary_mode(file)){
+        args[-1] = NULL_VAL;
+    } else {
+        args[-1] = OBJ_VAL(copyString(buffer, file_size + 1));
+    }
+
     return true;
+}
+
+// TODO: Binary file handling, checking readonly mode
+bool file_write(int argCount, Value self, Value* args){
+    if(argCount != 1){
+        args[-1] = errorOutput("Expected 1 argument to write method.");
+        return false;
+    }
+
+    if(!IS_STRING(args[0])){
+        args[-1] = errorOutput("Expected String datatype for argument to file write method.");
+        return false;
+    }
+
+    ObjFile* file = AS_FILE(self);
+    ObjString* string = AS_STRING(args[0]);
+
+    // file is opened in read-only mode
+    if(strstr(file->mode->chars, "r") != NULL && strstr(file->mode->chars, "+") == NULL){
+        args[-1] = errorOutput("Unable to write data into read-only file.");
+        return false;
+    }
+
+    _file_open(file);
+
+    if(!file->isOpen){
+        args[-1] = errorOutput("Unable to open file for writing.");
+        return false;
+    }
+
+    unsigned char* data;
+    int length;
+
+    if(is_binary_mode(file)){
+       
+    } else {
+        data = (unsigned char *) string->chars;
+        length = string->length;
+    }
+
+    size_t count = fwrite(data, sizeof(unsigned char), length, file->file);
+    fflush(file->file);
+
+    if(count > (size_t) 0){
+        args[-1] = NUMBER_VAL(count);
+        return true;
+    } else {
+        args[-1] = errorOutput("Unable to write data.");
+        return false;
+    }
 }
 
 bool file_close(int argCount, Value self, Value* args){
@@ -76,23 +177,19 @@ bool file_close(int argCount, Value self, Value* args){
         return false;
     }
     ObjFile* file = AS_FILE(self);
-    if(file->isOpen){
-        fclose(file->file);
-        file->file = NULL;
-        file->isOpen = false;
-    }
+    _file_close(file);
     return true;
 }
 
 ObjFile* file_open(ObjString* path, ObjString* mode){
     ObjFile* file = newFile(path, mode);
-    file->file = fopen(file->path->chars, mode->chars);
-    if(file->file != NULL)
-        file->isOpen = true; 
+    _file_open(file);
     return file;
 }
 
 void initFileNativeMethods(ObjFile* file){
     addNativeObjMethod(&file->nativeMethods, "read", file_read);
+    addNativeObjMethod(&file->nativeMethods, "exists", file_exists);
+    addNativeObjMethod(&file->nativeMethods, "write", file_write);
     addNativeObjMethod(&file->nativeMethods, "close", file_close);
 }
