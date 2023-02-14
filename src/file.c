@@ -171,7 +171,23 @@ bool file_write(int argCount, Value self, Value* args){
     }
 }
 
-bool file_close(int argCount, Value self, Value* args){
+bool mfile_open(int argCount, Value self, Value* args){
+    if(argCount != 0){
+        args[-1] = errorOutput("Expected 0 argument to open method.");
+        return false;
+    }
+    ObjFile* file = AS_FILE(self);
+    _file_open(file);
+
+    if(!file->isOpen){
+        args[-1] = errorOutput("Unable to open file.");
+        return false;
+    }
+
+    return true;
+}
+
+bool mfile_close(int argCount, Value self, Value* args){
     if(argCount != 0){
         args[-1] = errorOutput("Expected 0 argument to close method.");
         return false;
@@ -191,5 +207,6 @@ void initFileNativeMethods(ObjFile* file){
     addNativeObjMethod(&file->nativeMethods, "read", file_read);
     addNativeObjMethod(&file->nativeMethods, "exists", file_exists);
     addNativeObjMethod(&file->nativeMethods, "write", file_write);
-    addNativeObjMethod(&file->nativeMethods, "close", file_close);
+    addNativeObjMethod(&file->nativeMethods, "open", mfile_open);
+    addNativeObjMethod(&file->nativeMethods, "close", mfile_close);
 }
