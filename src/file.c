@@ -44,6 +44,10 @@ bool is_binary_mode(ObjFile* file){
     return strstr(file->mode->chars, "b") != NULL;
 }
 
+bool is_file_open(ObjFile* file){
+    return file->isOpen && file->file != NULL;
+}
+
 // TODO: Binary file handling, checking readonly mode
 bool file_exists(int argCount, Value self, Value* args){
     if(argCount != 0){
@@ -197,6 +201,26 @@ bool mfile_close(int argCount, Value self, Value* args){
     return true;
 }
 
+bool file_is_open(int argCount, Value self, Value* args){
+    if(argCount != 0){
+        args[-1] = errorOutput("Expected 0 argument to is_open method.");
+        return false;
+    }
+    ObjFile* file = AS_FILE(self);
+    args[-1] = BOOL_VAL(is_file_open(file));
+    return true;
+}
+
+bool file_is_closed(int argCount, Value self, Value* args){
+    if(argCount != 0){
+        args[-1] = errorOutput("Expected 0 argument to is_open method.");
+        return false;
+    }
+    ObjFile* file = AS_FILE(self);
+    args[-1] = BOOL_VAL(!is_file_open(file));
+    return true;
+}
+
 ObjFile* file_open(ObjString* path, ObjString* mode){
     ObjFile* file = newFile(path, mode);
     _file_open(file);
@@ -209,4 +233,7 @@ void initFileNativeMethods(ObjFile* file){
     addNativeObjMethod(&file->nativeMethods, "write", file_write);
     addNativeObjMethod(&file->nativeMethods, "open", mfile_open);
     addNativeObjMethod(&file->nativeMethods, "close", mfile_close);
+
+    addNativeObjMethod(&file->nativeMethods, "is_open", file_is_open);
+    addNativeObjMethod(&file->nativeMethods, "is_closed", file_is_closed);
 }

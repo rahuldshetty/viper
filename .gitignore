@@ -8,4 +8,5 @@ cmake/*
 !cmake/CMakeLists.txt
 
 dev.txt
+sample.txt
 wasm/
