@@ -221,6 +221,26 @@ bool file_is_closed(int argCount, Value self, Value* args){
     return true;
 }
 
+bool file_mode(int argCount, Value self, Value* args){
+    if(argCount != 0){
+        args[-1] = errorOutput("Expected 0 argument to is_open method.");
+        return false;
+    }
+    ObjFile* file = AS_FILE(self);
+    args[-1] = OBJ_VAL(file->mode);
+    return true;
+}
+
+bool file_path(int argCount, Value self, Value* args){
+    if(argCount != 0){
+        args[-1] = errorOutput("Expected 0 argument to is_open method.");
+        return false;
+    }
+    ObjFile* file = AS_FILE(self);
+    args[-1] = OBJ_VAL(file->path);
+    return true;
+}
+
 ObjFile* file_open(ObjString* path, ObjString* mode){
     ObjFile* file = newFile(path, mode);
     _file_open(file);
@@ -235,5 +255,7 @@ void initFileNativeMethods(ObjFile* file){
     addNativeObjMethod(&file->nativeMethods, "close", mfile_close);
 
     addNativeObjMethod(&file->nativeMethods, "is_open", file_is_open);
+    addNativeObjMethod(&file->nativeMethods, "mode", file_mode);
+    addNativeObjMethod(&file->nativeMethods, "path", file_path);
     addNativeObjMethod(&file->nativeMethods, "is_closed", file_is_closed);
 }
