@@ -8,6 +8,13 @@
 typedef struct Obj Obj;
 typedef struct ObjString ObjString;
 
+typedef enum {
+    TYPE_FUNCTION, // Body of function
+    TYPE_METHOD, // function inside class
+    TYPE_SCRIPT, // Top level code is also a function type
+    TYPE_INITIALIZER,
+} FunctionType;
+
 #ifdef NAN_BOXING
 
 #define QNAN     ((uint64_t)0x7ffc000000000000)

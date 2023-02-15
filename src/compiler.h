@@ -3,43 +3,54 @@
 
 #include "chunk.h"
 #include "object.h"
+#include "scanner.h"
+#include "token.h"
 
 #define MAX_SWITCH_CASES 256
 
+typedef struct {
+   Token current;
+   Token previous;
+   bool hadError;
+   bool panicMode;
+
+   Scanner* scanner;
+} Parser;
+
 ObjFunction* compile(const char* source);
 
-void expression();
+void expression(Parser* parser);
 
-void declaration();
-void varDeclaraction();
+void declaration(Parser* parser);
+void varDeclaraction(Parser* parser);
 
-void functionDeclaration();
-void function();
+void functionDeclaration(Parser* parser);
+void function(Parser* parser, FunctionType type);
 
-void classDeclaration();
+void classDeclaration(Parser* parser);
 
-void dot(bool);
+void dot(Parser* parser, bool);
 
-void block();
+void block(Parser* parser);
 void beginScope();
-void endScope();
+void endScope(Parser* parser);
 
-void statement();
-void returnStatement();
-void printStatement();
-void expressionStatement();
-void breakStatement();
-void continueStatement();
-void switchStatement();
+void statement(Parser* parser);
+void returnStatement(Parser* parser);
+void printStatement(Parser* parser);
+void expressionStatement(Parser* parser);
+void breakStatement(Parser* parser);
+void continueStatement(Parser* parser);
+void switchStatement(Parser* parser);
 
-void ifStatement();
-void whileStatement();
-void forStatement();
+void ifStatement(Parser* parser);
+void whileStatement(Parser* parser);
+void forStatement(Parser* parser);
 
-void and_(bool);
-void or_(bool);
+void and_(Parser* parser, bool);
+void or_(Parser* parser, bool);
 
-void synchronize();
+void synchronize(Parser* parser);
 
 void markCompilerRoots();
 

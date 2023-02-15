@@ -8,7 +8,7 @@
 - Shorthand expressions: += -= *= /= %=
 - Support for File Handling operations.
 - Language internal changes:
-    - Removed Scanner from global definition.
+    - Removed Scanner, Parser from global definition.
     - Dynamic growing value stack for real-time production application of Viper language.
     - 
 
