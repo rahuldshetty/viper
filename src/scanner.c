@@ -4,95 +4,95 @@
 #include "common.h"
 #include "scanner.h"
 
-void initScanner(const char* source){
-    scanner.start = source;
-    scanner.current = source;
-    scanner.line = 1;
+void initScanner(Scanner* scanner, const char* source){
+    scanner->start = source;
+    scanner->current = source;
+    scanner->line = 1;
 }
 
-bool isAtEnd(){
-    return *scanner.current == '\0';
+bool isAtEnd(Scanner* scanner){
+    return *scanner->current == '\0';
 }
 
-char peek(){
-    return *scanner.current;
+char peek(Scanner* scanner){
+    return *scanner->current;
 }
 
-char peekNext(){
-    if(isAtEnd()) return '\0';
-    return scanner.current[1];
+char peekNext(Scanner* scanner){
+    if(isAtEnd(scanner)) return '\0';
+    return scanner->current[1];
 }
 
-char advance(){
-    scanner.current++;
-    return scanner.current[-1];
+char advance(Scanner* scanner){
+    scanner->current++;
+    return scanner->current[-1];
 }
 
-bool match(char expected){
-    if(isAtEnd()) return false;
-    if(*scanner.current != expected) return false;
-    scanner.current++;
+bool match(Scanner* scanner, char expected){
+    if(isAtEnd(scanner)) return false;
+    if(*scanner->current != expected) return false;
+    scanner->current++;
     return true;
 }
 
-bool skipBlockComments(){
-    if(match('/') && match('*')){
+bool skipBlockComments(Scanner* scanner){
+    if(match(scanner, '/') && match(scanner, '*')){
         int nesting = 1;
 
         while(nesting > 0){
-            if(isAtEnd()){
+            if(isAtEnd(scanner)){
                 return false;
             }
 
-            if(peek() == '/' && peekNext() == '*'){
-                advance();
-                advance();
+            if(peek(scanner) == '/' && peekNext(scanner) == '*'){
+                advance(scanner);
+                advance(scanner);
                 nesting++;
             }
             
-            if(peek() == '*' && peekNext() == '/'){
-                advance();
-                advance();
+            if(peek(scanner) == '*' && peekNext(scanner) == '/'){
+                advance(scanner);
+                advance(scanner);
                 nesting--;
             } 
 
-            advance();
+            advance(scanner);
         }
     }
     return true;
 }
 
-bool skipWhitespace(){
+bool skipWhitespace(Scanner* scanner){
     for(;;){
-        char c = peek();
+        char c = peek(scanner);
 
         switch(c){
             case ' ':
             case '\r':
             case '\t':
-                advance();
+                advance(scanner);
                 break;
 
             case '\n':
                 // advance scanner line
-                scanner.line++;
-                advance();
+                scanner->line++;
+                advance(scanner);
                 break;
 
             case '/':
                 // Single line comment
-                if(peekNext() == '/'){
+                if(peekNext(scanner) == '/'){
                     // skip comment 
-                    while (peek() != '\n' && !isAtEnd()) advance();
+                    while (peek(scanner) != '\n' && !isAtEnd(scanner)) advance(scanner);
                     
                     // ignore new line character
-                    scanner.line++;
-                    advance();
+                    scanner->line++;
+                    advance(scanner);
                     continue;
                 }
-                else if(peekNext() == '*'){
+                else if(peekNext(scanner) == '*'){
                     // Skip multi-line comments
-                    if(!skipBlockComments()){
+                    if(!skipBlockComments(scanner)){
                         return false;
                     }
                     continue;

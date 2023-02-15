@@ -41,15 +41,15 @@ typedef struct{
     int line;
 } Token;
 
-Token scanToken();
-Token makeToken(TokenType type);
-Token errorToken(const char* message);
+Token scanToken(Scanner*);
+Token makeToken(Scanner*, TokenType);
+Token errorToken(Scanner*, const char*);
 
-Token string(char delimiter);
-Token number();
-Token identifier();
+Token string(Scanner*, char);
+Token number(Scanner*);
+Token identifier(Scanner*);
 
-TokenType identifierType();
-TokenType checkKeyword(int start, int length, const char* rest, TokenType type);
+TokenType identifierType(Scanner*);
+TokenType checkKeyword(Scanner*, int start, int length, const char* rest, TokenType type);
 
 #endif

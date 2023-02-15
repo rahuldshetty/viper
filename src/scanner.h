@@ -9,19 +9,17 @@ typedef struct {
     int line;
 } Scanner;
 
-void initScanner(const char* source);
+void initScanner(Scanner*, const char*);
 
-bool skipWhitespace();
+bool skipWhitespace(Scanner*);
 
-char advance();
-char peek();
-char peekNext();
+char advance(Scanner*);
+char peek(Scanner*);
+char peekNext(Scanner*);
 
-bool isAtEnd();
-bool match(char expected);
+bool isAtEnd(Scanner*);
+bool match(Scanner*, char expected);
 bool isDigit(char c);
 bool isAlpha(char c);
-
-Scanner scanner;
 
 #endif

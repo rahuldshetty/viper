@@ -19,6 +19,8 @@ typedef struct {
    Token previous;
    bool hadError;
    bool panicMode;
+
+   Scanner* scanner;
 } Parser;
 
 typedef struct{
@@ -229,7 +231,7 @@ void advance_parser(){
     parser.previous = parser.current;
 
     for(;;){
-        parser.current = scanToken();
+        parser.current = scanToken(parser.scanner);
 
         if(parser.current.type != TOKEN_ERROR) break;
 
@@ -1126,13 +1128,15 @@ void expressionStatement(){
 }
 
 ObjFunction* compile(const char* source){
-    initScanner(source);
+    Scanner scanner;
+    initScanner(&scanner, source);
+
+    parser.scanner = &scanner;    
+    parser.hadError = false;
+    parser.panicMode = false;
 
     Compiler compiler;
     initCompiler(&compiler, TYPE_SCRIPT);
-    
-    parser.hadError = false;
-    parser.panicMode = false;
 
     advance_parser();
 
