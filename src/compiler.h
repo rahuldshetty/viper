@@ -42,6 +42,7 @@ void expressionStatement(Parser* parser);
 void breakStatement(Parser* parser);
 void continueStatement(Parser* parser);
 void switchStatement(Parser* parser);
+void importStatement(Parser*);
 
 void ifStatement(Parser* parser);
 void whileStatement(Parser* parser);

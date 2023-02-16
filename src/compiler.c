@@ -138,6 +138,8 @@ ParseRule rules[] = {
   [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_BREAK]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_CONTINUE]      = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_AS]            = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_IMPORT]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EOF]           = {NULL,     NULL,   PREC_NONE},
 };
@@ -900,6 +902,8 @@ void statement(Parser* parser){
         continueStatement(parser);
     } else if(match_parser(parser, TOKEN_SWITCH)){
         switchStatement(parser);
+    } else if(match_parser(parser, TOKEN_IMPORT)){
+        importStatement(parser);
     }
     else {
         expressionStatement(parser);
@@ -1028,6 +1032,16 @@ void breakStatement(Parser* parser){
 // TODO
 void continueStatement(Parser* parser){
     
+    match_parser(parser, TOKEN_SEMICOLON);
+}
+
+// TODO
+void importStatement(parser){
+    char* module_name = NULL;
+    char* module_file = NULL;
+
+    
+
     match_parser(parser, TOKEN_SEMICOLON);
 }
 
