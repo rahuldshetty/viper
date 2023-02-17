@@ -81,9 +81,6 @@ ParseRule rules[] = {
   [TOKEN_EOF]           = {NULL,     NULL,   PREC_NONE},
 };
 
-// Compiler* current = NULL; // TODO: multiple compilers running in parallel
-// ClassCompiler* currentClass = NULL;
-
 Chunk* currentChunk(Parser* parser){
     return &(parser->vm->compiler->function->chunk);
 }
