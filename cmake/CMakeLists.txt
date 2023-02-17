@@ -20,6 +20,7 @@ set(VIPER_LIB_HEADERS
     ${SRC_DIR}/builtin.h    
     ${SRC_DIR}/chunk.h
     ${SRC_DIR}/common.h
+    ${SRC_DIR}/comp.h
     ${SRC_DIR}/compiler.h
     ${SRC_DIR}/debug.h
     ${SRC_DIR}/file.h
@@ -39,6 +40,7 @@ set(VIPER_LIB_HEADERS
 set(VIPER_LIB_SOURCES
 	${SRC_DIR}/builtin.c
 	${SRC_DIR}/chunk.c
+    ${SRC_DIR}/comp.c
     ${SRC_DIR}/compiler.c
     ${SRC_DIR}/debug.c
     ${SRC_DIR}/file.c

@@ -2,15 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "chunk.h"
-#include "common.h"
 #include "compiler.h"
-#include "memory.h"
-#include "value.h"
-
-#ifdef DEBUG_PRINT_CODE
-#include "debug.h"
-#endif
+#include "comp.h"
 
 ParseRule* getRule(Parser* parser, TokenType type);
 void parsePrecedence(Parser* parser, Precedence precedence);

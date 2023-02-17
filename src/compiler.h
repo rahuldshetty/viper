@@ -1,10 +1,16 @@
 #ifndef viper_compiler_h
 #define viper_compiler_h
 
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
+#include "common.h"
 #include "chunk.h"
 #include "object.h"
 #include "scanner.h"
 #include "token.h"
+#include "value.h"
 #include "vm.h"
 
 #define MAX_SWITCH_CASES 256
@@ -20,30 +26,6 @@ typedef struct {
    Scanner* scanner;
 } Parser;
 
-typedef struct{
-    Token name;
-    int depth;
-    bool isCaptured;
-} Local;
-
-typedef struct 
-{
-    uint8_t index;
-    bool isLocal;
-} Upvalue;
-
-typedef struct {
-    struct Compiler* enclosing; // Used to return control from function to parent callee flow
-
-    ObjFunction* function;
-    FunctionType type;
-
-    Local locals[UINT8_COUNT];
-    int localCount;
-    int scopeDepth;
-
-    Upvalue upvalues[UINT8_COUNT];
-} Compiler;
 
 typedef struct{
     struct ClassCompiler* enclosing;

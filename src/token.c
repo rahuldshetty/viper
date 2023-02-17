@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "scanner.h"
 #include "token.h"
 
 // TODO: String interpolation ${}

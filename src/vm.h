@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 
+#include "comp.h"
 #include "object.h"
 #include "table.h"
 #include "value.h"
@@ -37,6 +38,8 @@ typedef struct {
     int grayCount;
     int grayCapacity;
     Obj** grayStack;
+
+    Compiler* compiler;
 
     bool inited;
 } VM;

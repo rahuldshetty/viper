@@ -1,6 +1,8 @@
 #ifndef viper_token_h
 #define viper_token_h
 
+#include "scanner.h"
+
 typedef enum{
     // Single-character tokens.
     TOKEN_LEFT_BRACKET, TOKEN_RIGHT_BRACKET,
