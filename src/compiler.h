@@ -17,6 +17,62 @@ typedef struct {
    Scanner* scanner;
 } Parser;
 
+typedef struct{
+    Token name;
+    int depth;
+    bool isCaptured;
+} Local;
+
+typedef struct 
+{
+    uint8_t index;
+    bool isLocal;
+} Upvalue;
+
+typedef struct {
+    struct Compiler* enclosing; // Used to return control from function to parent callee flow
+
+    ObjFunction* function;
+    FunctionType type;
+
+    Local locals[UINT8_COUNT];
+    int localCount;
+    int scopeDepth;
+
+    Upvalue upvalues[UINT8_COUNT];
+} Compiler;
+
+typedef struct{
+    struct ClassCompiler* enclosing;
+    bool hasSuperclass;
+} ClassCompiler;
+
+// TODO: Ternary Operator
+
+typedef enum {
+  PREC_NONE,
+  PREC_ASSIGNMENT,  // =
+  PREC_TERNARY,     // ?:
+  PREC_OR,          // or
+  PREC_AND,         // and
+  PREC_EQUALITY,    // == !=
+  PREC_COMPARISON,  // < > <= >=
+  PREC_TERM,        // + -
+  PREC_FACTOR,      // * /
+  PREC_UNARY,       // ! -
+  PREC_CALL,        // . ()
+  PREC_INDEX,       // array[INDEX], map[INDEX]
+  PREC_PRIMARY
+} Precedence;
+
+typedef void (*ParseFn)(Parser* parser, bool canAssign);
+
+typedef struct{
+    ParseFn prefix;
+    ParseFn infix;
+    Precedence precedence;
+} ParseRule;
+
 ObjFunction* compile(const char* source);
 
 void expression(Parser* parser);
@@ -42,7 +98,7 @@ void expressionStatement(Parser* parser);
 void breakStatement(Parser* parser);
 void continueStatement(Parser* parser);
 void switchStatement(Parser* parser);
-void importStatement(Parser*);
+void importStatement(Parser* parser);
 
 void ifStatement(Parser* parser);
 void whileStatement(Parser* parser);
