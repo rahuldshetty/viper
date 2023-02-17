@@ -81,31 +81,34 @@ ParseRule rules[] = {
   [TOKEN_EOF]           = {NULL,     NULL,   PREC_NONE},
 };
 
-Compiler* current = NULL; // TODO: multiple compilers running in parallel
-ClassCompiler* currentClass = NULL;
+// Compiler* current = NULL; // TODO: multiple compilers running in parallel
+// ClassCompiler* currentClass = NULL;
 
-Chunk* currentChunk(){
-    return &(current->function->chunk);
+Chunk* currentChunk(Parser* parser){
+    return &(parser->vm->compiler->function->chunk);
 }
 
 void initCompiler(Parser* parser, Compiler* compiler, FunctionType type){
-    compiler->enclosing = (struct Compiler*) current;
+    compiler->enclosing = (struct Compiler*) parser->vm->compiler;
     compiler->type = type;
     compiler->localCount = 0;
     compiler->scopeDepth = 0;
     compiler->function = newFunction();
-    current = compiler;
+
+    parser->vm->compiler = compiler;
     
     // Copy function name
     if(type != TYPE_SCRIPT){
-        current->function->name = copyString(
+        push(OBJ_VAL(compiler->function));
+        parser->vm->compiler->function->name = copyString(
             parser->previous.start,
             parser->previous.length
         );
+        pop();
     }
 
     // Compiler claims variable stack's 0th location
-    Local* local = &current->locals[current->localCount++];
+    Local* local = &parser->vm->compiler->locals[parser->vm->compiler->localCount++];
     local->depth = 0;
     local->isCaptured = false;
 
@@ -178,7 +181,7 @@ bool match_parser(Parser* parser, TokenType type){
 }
 
 void emitByte(Parser* parser, uint8_t byte){
-    writeChunk(currentChunk(), byte, parser->previous.line);
+    writeChunk(currentChunk(parser), byte, parser->previous.line);
 }
 
 void emitBytes(Parser* parser, uint8_t byte1, uint8_t byte2){
@@ -190,13 +193,13 @@ int emitJump(Parser* parser, uint8_t instruction){
     emitByte(parser, instruction);
     emitByte(parser, 0xff);
     emitByte(parser, 0xff);
-    return currentChunk()->count - 2;
+    return currentChunk(parser)->count - 2;
 }
 
 void emitLoop(Parser* parser, int loopStart){
     emitByte(parser, OP_LOOP);
 
-    int offset = currentChunk()->count - loopStart + 2;
+    int offset = currentChunk(parser)->count - loopStart + 2;
     if(offset > UINT16_MAX) error(parser, "Too large loop body.");
 
     emitByte(parser, (offset >> 8) & 0xff);
@@ -204,7 +207,7 @@ void emitLoop(Parser* parser, int loopStart){
 }
 
 void emitReturn(Parser* parser){
-    if(current->type == TYPE_INITIALIZER){
+    if(parser->vm->compiler->type == TYPE_INITIALIZER){
         emitBytes(parser, OP_GET_LOCAL, 0);
     } else{
         emitByte(parser, OP_NULL); // return NULL by default from function calls
@@ -215,7 +218,7 @@ void emitReturn(Parser* parser){
 
 // handle number values
 uint8_t makeConstant(Parser* parser, Value value){
-    int constant = addConstant(currentChunk(), value);
+    int constant = addConstant(currentChunk(parser), value);
 
     if(constant > UINT8_MAX){
         error(parser, "Too many constants in one chunk.");
@@ -227,34 +230,34 @@ uint8_t makeConstant(Parser* parser, Value value){
 
 void emitConstant(Parser* parser, Value value){
     // Support emitting large constant values
-    writeConstant(currentChunk(), value, parser->previous.line);
+    writeConstant(currentChunk(parser), value, parser->previous.line);
 }
 
 void patchJump(Parser* parser, int offset){
     // -2 to adjust for bytecode of jump offset itself
-    int jump = currentChunk()->count - offset - 2;
+    int jump = currentChunk(parser)->count - offset - 2;
 
     if(jump > UINT16_MAX){
         error(parser, "Too much code to jump over.");
     }
 
-    currentChunk()->code[offset] = (jump >> 8) & 0xff;
-    currentChunk()->code[offset + 1] = jump & 0xff;
+    currentChunk(parser)->code[offset] = (jump >> 8) & 0xff;
+    currentChunk(parser)->code[offset + 1] = jump & 0xff;
 
 }
 
 ObjFunction* endCompiler(Parser* parser){
     emitReturn(parser);
-    ObjFunction* function = current->function;
+    ObjFunction* function = parser->vm->compiler->function;
 
 #ifdef DEBUG_PRINT_CODE
     if(!parser.hadError){
-        disassembleChunk(currentChunk(), function->name != NULL ? 
+        disassembleChunk(currentChunk(parser), function->name != NULL ? 
             function->name->chars: "<script>");
     }
 #endif
 
-    current = (Compiler*) current->enclosing;
+    parser->vm->compiler = (Compiler*) parser->vm->compiler->enclosing;
     return function;
 }
 
@@ -351,19 +354,19 @@ int resolveUpValue(Parser* parser, Compiler* compiler, Token* name){
 
 void addLocal(Parser* parser, Token name){
     // Reach max limit for the local variable array
-    if(current->localCount == UINT8_COUNT){
+    if(parser->vm->compiler->localCount == UINT8_COUNT){
         error(parser, "Too many local variables in block.");
         return;
     }
 
-    Local* local = &current->locals[current->localCount++];
+    Local* local = &parser->vm->compiler->locals[parser->vm->compiler->localCount++];
     local->name = name;
     local->depth = -1;
 }
 
 // Variable added to scope but not ready to use yet.
 void declareVariable(Parser* parser){
-    if(current->scopeDepth == 0) return;
+    if(parser->vm->compiler->scopeDepth == 0) return;
 
     Token* name = &parser->previous;
 
@@ -394,14 +397,14 @@ uint8_t parseVariable(Parser* parser, const char* errorMessage){
 
     // Exit scope if we're in local scope 
     // at runtime, locals are not looked up
-    if(current->scopeDepth > 0) return 0;
+    if(parser->vm->compiler->scopeDepth > 0) return 0;
 
     return identifierConstant(parser, &parser->previous);
 }
 
-void markInitialized(){
-    if(current->scopeDepth == 0) return;
-    current->locals[current->localCount - 1].depth = current->scopeDepth;
+void markInitialized(Parser* parser){
+    if(parser->vm->compiler->scopeDepth == 0) return;
+    parser->vm->compiler->locals[parser->vm->compiler->localCount - 1].depth = parser->vm->compiler->scopeDepth;
 }
 
 ParseRule* getRule(Parser* parser, TokenType type){
@@ -549,8 +552,8 @@ void declaration(Parser* parser){
 // Variable ready to use.
 void defineVariable(Parser* parser, uint8_t global){
     // local variable not processed until runtime
-    if(current->scopeDepth > 0){
-        markInitialized();
+    if(parser->vm->compiler->scopeDepth > 0){
+        markInitialized(parser);
         return;
     }
 
@@ -595,7 +598,7 @@ void varDeclaraction(Parser* parser){
 // Function Declaration
 void functionDeclaration(Parser* parser){
     uint8_t global = parseVariable(parser, "Expected function name.");
-    markInitialized();
+    markInitialized(parser);
     function(parser, TYPE_FUNCTION);
     defineVariable(parser, global);
 }
@@ -604,15 +607,15 @@ void functionDeclaration(Parser* parser){
 void function(Parser* parser, FunctionType type){
     Compiler compiler;
     initCompiler(parser, &compiler, type);
-    beginScope();
+    beginScope(parser);
 
     consume(parser, TOKEN_LEFT_PAREN, "Expected '(' after function name.");
 
     // Parameter processing
     if(!check(parser, TOKEN_RIGHT_PAREN)){
         do{
-            current->function->arity++;
-            if(current->function->arity > 255){
+            parser->vm->compiler->function->arity++;
+            if(parser->vm->compiler->function->arity > 255){
                 errorAtCurrent(parser, "Can't have more than 255 parameters.");
             }
             uint8_t constant = parseVariable(parser, "Expected parameter name");
@@ -673,8 +676,8 @@ void classDeclaration(Parser* parser){
 
     ClassCompiler classCompiler;
     classCompiler.hasSuperclass = false;
-    classCompiler.enclosing = (struct ClassCompiler*) currentClass;
-    currentClass = &classCompiler;
+    classCompiler.enclosing = (struct ClassCompiler*) parser->currentClass;
+    parser->currentClass = &classCompiler;
 
     // Accept Parent class for inheritence
     if(match_parser(parser, TOKEN_LEFT_PAREN)){
@@ -686,7 +689,7 @@ void classDeclaration(Parser* parser){
             error(parser, "A class cannot inherit from itself.");
         }
 
-        beginScope();
+        beginScope(parser);
         addLocal(parser, syntheticToken("super"));
         defineVariable(parser, 0);
 
@@ -711,7 +714,7 @@ void classDeclaration(Parser* parser){
         endScope(parser);
     }
 
-    currentClass = (ClassCompiler*) currentClass->enclosing;
+    parser->currentClass = (ClassCompiler*) parser->currentClass->enclosing;
 }
 
 void dot(Parser* parser, bool canAssign){
@@ -768,12 +771,12 @@ void emitShorthandAssign(Parser* parser, uint8_t getOp, uint8_t setOp, OpCode op
 void namedVariable(Parser* parser, Token name, bool canAssign){
     uint8_t getOp, setOp;
 
-    int arg = resolveLocal(parser, current, &name);
+    int arg = resolveLocal(parser, parser->vm->compiler, &name);
     
     if(arg != -1){
         getOp = OP_GET_LOCAL;
         setOp = OP_SET_LOCAL;
-    } else if((arg = resolveUpValue(parser, current, &name)) != -1){
+    } else if((arg = resolveUpValue(parser, parser->vm->compiler, &name)) != -1){
         getOp = OP_GET_UPVALUE;
         setOp = OP_SET_UPVALUE;
     } else {
@@ -830,7 +833,7 @@ void statement(Parser* parser){
         whileStatement(parser);
     } else if(match_parser(parser, TOKEN_LEFT_BRACE)){
         // Parse Block statements
-        beginScope();
+        beginScope(parser);
         block(parser);
         endScope(parser);
     } else if(match_parser(parser, TOKEN_BREAK)){
@@ -848,12 +851,12 @@ void statement(Parser* parser){
 }
 
 void returnStatement(Parser* parser){
-    if(current->type == TYPE_SCRIPT){
+    if(parser->vm->compiler->type == TYPE_SCRIPT){
         error(parser, "Can't return from top-level code.");
     }
     
     if(!match_parser(parser, TOKEN_SEMICOLON)){
-        if(current->type == TYPE_INITIALIZER){
+        if(parser->vm->compiler->type == TYPE_INITIALIZER){
             error(parser, "Can't return value from constructor.");
         }
 
@@ -875,7 +878,7 @@ void printStatement(Parser* parser){
 
 // Loop - While Statement
 void whileStatement(Parser* parser){
-    int loopStart = currentChunk()->count;
+    int loopStart = currentChunk(parser)->count;
 
     // Enclosing condition inside '(' ')' is optional 
     bool paranFound = match_parser(parser, TOKEN_LEFT_PAREN);
@@ -904,7 +907,7 @@ void whileStatement(Parser* parser){
 // Loop - For Statement
 void forStatement(Parser* parser){
     // Variable declared within loop statement are scoped internally only.
-    beginScope();
+    beginScope(parser);
 
     // Enclosing condition inside '(' ')' is optional 
     bool paranFound = match_parser(parser, TOKEN_LEFT_PAREN);
@@ -918,7 +921,7 @@ void forStatement(Parser* parser){
     }
     
     // Condition
-    int loopStart = currentChunk()->count;
+    int loopStart = currentChunk(parser)->count;
     int exitJump = -1;
     if(!match_parser(parser, TOKEN_SEMICOLON)){
         expression(parser);
@@ -933,7 +936,7 @@ void forStatement(Parser* parser){
     if(!match_parser(parser, TOKEN_RIGHT_PAREN)){
         // track where increment expression begins in stack
         int bodyJump = emitJump(parser, OP_JUMP);
-        int incrementStart = currentChunk()->count;
+        int incrementStart = currentChunk(parser)->count;
 
         // parse increment expression
         expression(parser);
@@ -1110,23 +1113,23 @@ void synchronize(Parser* parser){
     }
 }
 
-void beginScope(){
-    current->scopeDepth++;
+void beginScope(Parser* parser){
+    parser->vm->compiler->scopeDepth++;
 }
 
 void endScope(Parser* parser){
-    current->scopeDepth--;
+    parser->vm->compiler->scopeDepth--;
 
     // TODO: Optimization by OP_POPN if sequence of stack items to be removed
-    while(current->localCount > 0 && 
-        current->locals[current->localCount - 1].depth > current->scopeDepth
+    while(parser->vm->compiler->localCount > 0 && 
+        parser->vm->compiler->locals[parser->vm->compiler->localCount - 1].depth > parser->vm->compiler->scopeDepth
     ){
-        if(current->locals[current->localCount - 1].isCaptured){
+        if(parser->vm->compiler->locals[parser->vm->compiler->localCount - 1].isCaptured){
             emitByte(parser, OP_CLOSE_UPVALUE);
         } else {
             emitByte(parser, OP_POP);
         }
-        current->localCount--;
+        parser->vm->compiler->localCount--;
     }
 
 }
@@ -1165,11 +1168,10 @@ void ifStatement(Parser* parser){
 
     if(match_parser(parser,TOKEN_ELSE)) statement(parser);
     patchJump(parser, elseJump);
-    
 }
 
-void markCompilerRoots(){
-    Compiler* compiler = current;
+void markCompilerRoots(VM* vm){
+    Compiler* compiler = vm->compiler;
     while(compiler != NULL){
         markObject((Obj*)compiler->function);
         compiler = (Compiler *)(compiler->enclosing);
@@ -1177,7 +1179,7 @@ void markCompilerRoots(){
 }
 
 void this_(Parser* parser, bool canAssign){
-    if(currentClass == NULL){
+    if(parser->currentClass == NULL){
         error(parser, "Can't use 'this' outside of a class.");
         return;
     }
@@ -1186,9 +1188,9 @@ void this_(Parser* parser, bool canAssign){
 }
 
 void super_(Parser* parser, bool canAssign){
-    if(currentClass == NULL){
+    if(parser->currentClass == NULL){
         error(parser, "Can't use 'super' outside of a class.");
-    } else if(!currentClass->hasSuperclass) {
+    } else if(!parser->currentClass->hasSuperclass) {
         error(parser, "Can't use 'super' in a class with no superclass.");
     }
     consume(parser, TOKEN_DOT, "Expected dot operator after 'super'.");

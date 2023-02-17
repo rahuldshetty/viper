@@ -8,12 +8,18 @@
 #include "common.h"
 #include "chunk.h"
 #include "object.h"
+#include "memory.h"
 #include "scanner.h"
 #include "token.h"
 #include "value.h"
 #include "vm.h"
 
 #define MAX_SWITCH_CASES 256
+
+typedef struct{
+    struct ClassCompiler* enclosing;
+    bool hasSuperclass;
+} ClassCompiler;
 
 typedef struct {
    Token current;
@@ -24,13 +30,9 @@ typedef struct {
    VM* vm;
 
    Scanner* scanner;
+   ClassCompiler* currentClass;
 } Parser;
 
-
-typedef struct{
-    struct ClassCompiler* enclosing;
-    bool hasSuperclass;
-} ClassCompiler;
 
 // TODO: Ternary Operator
 
@@ -73,7 +75,7 @@ void classDeclaration(Parser* parser);
 void dot(Parser* parser, bool);
 
 void block(Parser* parser);
-void beginScope();
+void beginScope(Parser* parser);
 void endScope(Parser* parser);
 
 void statement(Parser* parser);
@@ -94,6 +96,6 @@ void or_(Parser* parser, bool);
 
 void synchronize(Parser* parser);
 
-void markCompilerRoots();
+void markCompilerRoots(VM*);
 
 #endif

@@ -19,6 +19,7 @@ void initVM(){
         return;
     }
 
+    vm.compiler = NULL;
     vm.stack = NULL;
     vm.stackCapacity = 0;
 

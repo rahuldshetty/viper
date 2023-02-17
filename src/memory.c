@@ -214,7 +214,7 @@ void markRoots(){
     }
 
     markTable(&vm.globals);
-    markCompilerRoots();
+    markCompilerRoots(&vm);
 }
 
 void blackendObject(Obj* object){
