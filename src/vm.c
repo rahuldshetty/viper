@@ -553,8 +553,10 @@ InterpretResult run(){
     #undef READ_SHORT
 }
 
-InterpretResult interpret(const char* source){
-    ObjFunction* function = compile(source);
+InterpretResult interpret(VM* vm, const char* source){
+    
+    ObjFunction* function = compile(vm, source);
+
     if(function==NULL) return INTERPRET_COMPILE_ERROR;
 
     push(OBJ_VAL(function));

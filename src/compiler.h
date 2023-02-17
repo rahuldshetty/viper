@@ -5,6 +5,7 @@
 #include "object.h"
 #include "scanner.h"
 #include "token.h"
+#include "vm.h"
 
 #define MAX_SWITCH_CASES 256
 
@@ -13,6 +14,8 @@ typedef struct {
    Token previous;
    bool hadError;
    bool panicMode;
+
+   VM* vm;
 
    Scanner* scanner;
 } Parser;
@@ -73,7 +76,7 @@ typedef struct{
     Precedence precedence;
 } ParseRule;
 
-ObjFunction* compile(const char* source);
+ObjFunction* compile(VM* vm, const char* source);
 
 void expression(Parser* parser);
 

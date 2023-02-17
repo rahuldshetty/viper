@@ -1067,11 +1067,13 @@ void expressionStatement(Parser* parser){
     emitByte(parser, OP_POP);
 }
 
-ObjFunction* compile(const char* source){
+ObjFunction* compile(VM* vm, const char* source){
     Scanner scanner;
     initScanner(&scanner, source);
 
     Parser parser;
+
+    parser.vm = vm;
 
     parser.scanner = &scanner;    
     parser.hadError = false;
