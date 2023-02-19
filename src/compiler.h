@@ -33,9 +33,6 @@ typedef struct {
    ClassCompiler* currentClass;
 } Parser;
 
-
-// TODO: Ternary Operator
-
 typedef enum {
   PREC_NONE,
   PREC_ASSIGNMENT,  // =

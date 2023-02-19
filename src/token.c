@@ -163,7 +163,13 @@ TokenType identifierType(Scanner* scanner){
                 }
             }
         case 'd': return checkKeyword(scanner, 1, 6, "efault", TOKEN_DEFAULT);
-        case 'e': return checkKeyword(scanner, 1, 3, "lse", TOKEN_ELSE);
+        case 'e':
+            if (scanner->current - scanner->start > 1) {
+                switch (scanner->start[1]) {
+                    case 'a': return checkKeyword(scanner, 2, 2, "ch", TOKEN_EACH);
+                    case 'l': return checkKeyword(scanner, 2, 2, "se", TOKEN_ELSE);
+                }
+            }
         case 'f':
             if(scanner->current - scanner->start == 2 && scanner->start[1] == 'n'){
                 return TOKEN_FUNCTION;
