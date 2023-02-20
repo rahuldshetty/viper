@@ -14,6 +14,7 @@ void initScanner(Scanner*, const char*);
 bool skipWhitespace(Scanner*);
 
 char advance(Scanner*);
+char previous(Scanner*);
 char peek(Scanner*);
 char peekNext(Scanner*);
 
@@ -21,5 +22,8 @@ bool isAtEnd(Scanner*);
 bool match(Scanner*, char expected);
 bool isDigit(char c);
 bool isAlpha(char c);
+bool isBinary(char c);
+bool isOctal(char c);
+bool isHex(char c);
 
 #endif

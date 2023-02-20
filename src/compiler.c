@@ -57,6 +57,9 @@ ParseRule rules[] = {
   [TOKEN_IDENTIFIER]    = {variable, NULL,     PREC_NONE},
   [TOKEN_STRING]        = {string_constant,     NULL,   PREC_NONE},
   [TOKEN_NUMBER]        = {number_constant,   NULL,   PREC_NONE},
+  [TOKEN_BINARY_NUMBER] = {number_constant,   NULL,   PREC_NONE},
+  [TOKEN_OCTAL_NUMBER]  = {number_constant,   NULL,   PREC_NONE},
+  [TOKEN_HEX_NUMBER]    = {number_constant,   NULL,   PREC_NONE},
   [TOKEN_AND]           = {NULL,     and_,   PREC_AND},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
@@ -77,6 +80,7 @@ ParseRule rules[] = {
   [TOKEN_CONTINUE]      = {NULL,     NULL,   PREC_NONE},
   [TOKEN_AS]            = {NULL,     NULL,   PREC_NONE},
   [TOKEN_IMPORT]        = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_EACH]          = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EOF]           = {NULL,     NULL,   PREC_NONE},
 };
@@ -472,10 +476,35 @@ void map_literal(Parser* parser, bool canAssign){
     match_parser(parser, TOKEN_SEMICOLON);
 }
 
+Value compile_number_value(Parser* parser){
+    switch (parser->previous.type)
+    {   
+        // ignore 0b, 0c, 0x
+        case TOKEN_BINARY_NUMBER:{
+            long long value = strtoll(parser->previous.start + 2, NULL, 2);
+            return NUMBER_VAL(value);
+        }
+
+        case TOKEN_OCTAL_NUMBER:{
+            long value = strtol(parser->previous.start + 2, NULL, 8);
+            return NUMBER_VAL(value);
+        }
+
+        case TOKEN_HEX_NUMBER:{
+            long value = strtol(parser->previous.start, NULL, 16);
+            return NUMBER_VAL(value);
+        }
+    
+        default:{
+            double value = strtod(parser->previous.start, NULL);
+            return NUMBER_VAL(value);
+        }
+    }
+}
+
 // List of handler for tokens
 void number_constant(Parser* parser, bool canAssign){
-    double value = strtod(parser->previous.start, NULL);
-    emitConstant(parser, NUMBER_VAL(value));
+    emitConstant(parser, compile_number_value(parser));
 }
 
 void string_constant(Parser* parser, bool canAssign){

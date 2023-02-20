@@ -14,6 +14,10 @@ bool isAtEnd(Scanner* scanner){
     return *scanner->current == '\0';
 }
 
+char previous(Scanner* scanner){
+    return scanner->current[-1];
+}
+
 char peek(Scanner* scanner){
     return *scanner->current;
 }
@@ -116,4 +120,16 @@ bool isAlpha(char c){
         (c >= 'A' && c <= 'Z') ||
         c == '_'
     );
+}
+
+bool isBinary(char c){
+    return c == '0' || c == '1';
+}
+
+bool isOctal(char c){
+    return c >= '0' && c <= '7';
+}
+
+bool isHex(char c){
+    return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 }

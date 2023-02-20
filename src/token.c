@@ -125,6 +125,29 @@ Token string(Scanner* scanner, char delimiter){
 }
 
 Token number(Scanner* scanner){
+    if(previous(scanner) == '0'){       
+        // Binary Number
+        if(match(scanner, 'b')){
+            advance(scanner);
+            while(isBinary(peek(scanner))) advance(scanner);
+            return makeToken(scanner, TOKEN_BINARY_NUMBER);
+        }
+
+        // Octal Number
+        if(match(scanner, 'c')){
+            advance(scanner);
+            while(isOctal(peek(scanner))) advance(scanner);
+            return makeToken(scanner, TOKEN_OCTAL_NUMBER);
+        }
+
+        // Hexadecimal Number
+        if(match(scanner, 'x')){
+            advance(scanner);
+            while(isHex(peek(scanner))) advance(scanner);
+            return makeToken(scanner, TOKEN_HEX_NUMBER);
+        }
+    }
+
     while(isDigit(peek(scanner))) advance(scanner);
 
     // Look for fractional part by matching dot

@@ -7,6 +7,10 @@
 - Single quoted string datatype.
 - Shorthand expressions: += -= *= /= %=
 - Support for File Handling operations.
+- Additional support for Number datatypes:
+    - Binary number format. Eg: 0b000001101
+    - Octal number format. Eg: 0c716
+    - Hexadecimal number format. Eg: 0x4adF
 - Language internal changes:
     - Removed Scanner, Parser from global definition.
     - Dynamic growing value stack for real-time production application of Viper language.
