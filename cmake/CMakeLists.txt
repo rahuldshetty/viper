@@ -17,7 +17,8 @@ set(gcc_generic_flags -Wall -Wextra -Werror -Wno-unused-function -Wno-unused-var
 ADD_EXECUTABLE(${PACKAGE} ${SRC_DIR}/main.c ${HEADERS})
 
 set(VIPER_LIB_HEADERS
-    ${SRC_DIR}/builtin.h    
+    ${SRC_DIR}/builtin.h   
+    ${SRC_DIR}/bytes.h    
     ${SRC_DIR}/chunk.h
     ${SRC_DIR}/common.h
     ${SRC_DIR}/comp.h
@@ -39,6 +40,7 @@ set(VIPER_LIB_HEADERS
 
 set(VIPER_LIB_SOURCES
 	${SRC_DIR}/builtin.c
+    ${SRC_DIR}/bytes.c   
 	${SRC_DIR}/chunk.c
     ${SRC_DIR}/comp.c
     ${SRC_DIR}/compiler.c

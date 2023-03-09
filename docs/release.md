@@ -14,7 +14,7 @@
 - Language internal changes:
     - Removed Scanner, Parser from global definition.
     - Dynamic growing value stack for real-time production application of Viper language.
-    - 
+- Added native method "bytes" to handle bytes data stream. 
 
 ## Alpha: 1.0
 

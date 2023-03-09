@@ -99,12 +99,20 @@ typedef struct {
     Value* values;
 } ValueArray;
 
+typedef struct{
+    int count;
+    unsigned char* byte;
+} ByteArray;
+
 void initValueArray(ValueArray* array);
 void writeValueArray(ValueArray* array, Value value);
 void freeValueArray(ValueArray* array);
 void printValue(Value value);
 bool valuesEqual(Value a, Value b);
 bool isInteger(double num);
+
+void initByteArray(ByteArray* bytes, int length);
+void freeByteArray(ByteArray* bytes);
 
 uint32_t hashValue(Value);
 

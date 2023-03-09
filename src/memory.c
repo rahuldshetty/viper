@@ -119,6 +119,13 @@ void freeObject(Obj* object){
             break;
         }
 
+        case OBJ_BYTE:{
+            ObjByte* byte = (ObjByte*) object;
+            freeByteArray(&byte->bytes);
+            FREE(ObjByte, object);
+            break;
+        }
+
     }
 }
 

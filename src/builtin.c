@@ -1,6 +1,7 @@
 #include <time.h>
 
 #include "builtin.h"
+#include "bytes.h"
 #include "file.h"
 #include "object.h"
 #include "value.h"
@@ -88,9 +89,26 @@ bool fileNative(int argCount, Value* args){
     return true;
 }
 
+bool to_bytes(int argCount, Value* args){
+    Value item = args[0];
+    if(argCount != 1){
+        args[-1] = errorOutput("Expected 1 argument to bytes method.");
+        return false;
+    }
+    if(!IS_NUMBER(item) && !IS_LIST(item)){
+        args[-1] = errorOutput("Expected list or number datatype for parameter.");
+        return false;
+    }
+    
+    args[-1] = OBJ_VAL(createByteObject(item));
+
+    return true;
+}
+
 void registerBuiltInFunctions(){
     defineNative("clock", clockNative);
     defineNative("len", lenNative);
     defineNative("str", strNative);
     defineNative("file", fileNative);
+    defineNative("bytes", to_bytes);
 }

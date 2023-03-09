@@ -21,6 +21,7 @@
 #define IS_LIST(value) isObjType(value, OBJ_LIST)
 #define IS_MAP(value) isObjType(value, OBJ_MAP)
 #define IS_FILE(value) isObjType(value, OBJ_FILE)
+#define IS_BYTE(value) isObjType(value, OBJ_BYTE)
 
 #define AS_STRING(value) (((ObjString*)AS_OBJ(value)))
 #define AS_CSTRING(value) (((ObjString*)AS_OBJ(value))->chars)
@@ -34,6 +35,7 @@
 #define AS_LIST(value) ((ObjList*)AS_OBJ(value))
 #define AS_MAP(value) ((ObjMap*)AS_OBJ(value))
 #define AS_FILE(value) ((ObjFile*)AS_OBJ(value))
+#define AS_BYTE(value) ((ObjByte*)AS_OBJ(value))
 
 typedef enum {
     OBJ_STRING,
@@ -46,6 +48,7 @@ typedef enum {
     OBJ_LIST,
     OBJ_MAP,
     OBJ_FILE,
+    OBJ_BYTE,
 } ObjType;
 
 struct Obj {
@@ -107,6 +110,11 @@ typedef struct{
     Table nativeMethods;
 } ObjList;
 
+typedef struct{
+    Obj obj;
+    ByteArray bytes;
+} ObjByte;
+
 typedef struct {
     Value key;
     Value value;
@@ -166,6 +174,8 @@ ObjList* newList();
 ObjMap* newMap();
 
 ObjFile* newFile(ObjString* path, ObjString* mode);
+
+ObjByte* newBytes(int length);
 
 ObjString* strObject(Value obj);
 

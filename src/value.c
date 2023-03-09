@@ -162,3 +162,12 @@ ObjString* strValue(Value obj){
         return strObject(obj);
     }
 }
+
+void initByteArray(ByteArray* bytes, int length){
+    bytes->count = length;
+    bytes->byte = GROW_ARRAY(unsigned char, bytes->byte, 0, bytes->count);
+}
+
+void freeByteArray(ByteArray* bytes){
+    FREE_ARRAY(unsigned char, bytes->byte, bytes->count);
+}

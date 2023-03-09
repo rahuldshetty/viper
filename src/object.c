@@ -64,6 +64,22 @@ void printFunction(ObjFunction* function){
     printf("<fn '%s'>", function->name->chars);
 }
 
+void printBytes(ObjByte* bytes){
+    printf("(");
+    for(int i = 0; i < bytes->bytes.count; i++){
+        printf("%x", bytes->bytes.byte[i]);
+        if(i > 100){ // as bytes can get really heavy
+            printf("...");
+            break;
+        }
+
+        if(i != bytes->bytes.count - 1){
+            printf(", ");
+        }
+    }
+    printf(")");
+}
+
 Obj* allocateObject(size_t size, ObjType type){
     Obj* object = (Obj*)reallocate(NULL, 0, size);
     object->type = type;
@@ -101,6 +117,11 @@ void printObject(Value value){
 
         case OBJ_NATIVE:{
             printf("<built-in fn>");
+            break;
+        }
+
+        case OBJ_BYTE: {
+            printBytes(AS_BYTE(value));
             break;
         }
 
@@ -361,6 +382,46 @@ ObjString* sprintFunction(ObjFunction* function){
     return sprintTaggedString("fn", function->name->chars);
 }
 
+char *appendString(char *old, char *new_str) {
+  // quick exit...
+  if(new_str == NULL) {
+    return old;
+  }
+
+  // find the size of the string to allocate
+  const size_t old_len = strlen(old), new_len = strlen(new_str);
+  const size_t out_len = old_len + new_len;
+
+  // allocate a pointer to the new string
+  char *out = (char *) realloc((void *) old, out_len + 1);
+
+  // concat both strings and return
+  if (out != NULL) {
+    memcpy(out + old_len, new_str, new_len);
+    out[out_len] = '\0';
+    return out;
+  }
+
+  return old;
+}
+
+ObjString* sprintByte(ObjByte* bytes){
+    char *str = strdup("(");
+    for (int i = 0; i < bytes->bytes.count; i++) {
+        char *chars = ALLOCATE(char, snprintf(NULL, 0, "0x%x", bytes->bytes.byte[i]));
+        if (chars != NULL) {
+            sprintf(chars, "0x%x", bytes->bytes.byte[i]);
+            str = appendString(str, chars);
+        }
+
+        if (i != bytes->bytes.count - 1) {
+            str = appendString(str, ", ");
+        }
+    }
+    str = appendString(str, ")");
+    return copyString(str, strlen(str));
+}
+
 ObjString* strObject(Value obj){
     switch OBJ_TYPE(obj){
         case OBJ_STRING:
@@ -374,6 +435,9 @@ ObjString* strObject(Value obj){
         
         case OBJ_CLOSURE:
             return sprintFunction(AS_CLOSURE(obj)->function);
+
+        case OBJ_BYTE:
+            return sprintByte(AS_BYTE(obj));
 
         case OBJ_CLASS:
             return sprintTaggedString("class", AS_CLASS(obj)->name->chars);
@@ -407,4 +471,10 @@ ObjString* strObject(Value obj){
     }
 
     return copyString("null", 4);
+}
+
+ObjByte* newBytes(int length){
+    ObjByte* bytes = ALLOCATE_OBJ(ObjByte, OBJ_BYTE);
+    initByteArray(&bytes->bytes, length);
+    return bytes;
 }

@@ -14,6 +14,7 @@
 - [Object Oriented Programming](oops/intro.md)
     - [Constructors](oops/constructor.md)
     - [Inheritance](oops/inheritance.md)
+- [Working with Binary Data](binary.md)
 - [Viper Developer Guide](developer/intro.md)
 - [Release Notes](release.md)
 - [What's Next?](future.md)

@@ -24,6 +24,30 @@
 - Support for Object Oriented Programming.
 - Dynamic memory allocation & Garbage collector (Mark-Sweep Algorithm).
 
+## Installation
+
+Install Viper [guide](https://rahuldshetty.github.io/viper/#/guide?id=installation).
+
+## Example
+
+```intro.md
+names = ["Vipers", "World!", ""]
+
+class HelloPrinter {
+    fn print(name){
+        print "Hello " + str(name)
+    }
+}
+
+printer = HelloPrinter()
+
+for (i = 0 ; i < len(names) ; i = i + 1){
+    if ( names[i] != "") {
+        printer.print(names[i])
+    }
+}
+```
+
 ## Contributing
 
 If you would like to contribute to the project or report any bugs, feel free to raise this in the Github Issue [tracker](https://github.com/rahuldshetty/viper/issues).  
