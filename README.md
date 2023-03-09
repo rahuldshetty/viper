@@ -34,7 +34,7 @@ Install Viper [guide](https://rahuldshetty.github.io/viper/#/guide?id=installati
 names = ["Vipers", "World!", ""]
 
 class HelloPrinter {
-    fn print(name){
+    fn hello(name){
         print "Hello " + str(name)
     }
 }
@@ -43,7 +43,7 @@ printer = HelloPrinter()
 
 for (i = 0 ; i < len(names) ; i = i + 1){
     if ( names[i] != "") {
-        printer.print(names[i])
+        printer.hello(names[i])
     }
 }
 ```
