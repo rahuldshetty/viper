@@ -5,6 +5,7 @@ String is a sequence of character enclosed within double quotes.
 - Strings are mutable by nature.
 - You can only update a single character at once in the string.
 - You can use the range selector operator [start:end] to extract a substring. This will return another string object starting at index "start" and ending at index "end-1". (Convention similar to Python).
+- Strings can process escape characters starting with \. For e.g, "Hello\nThere" will be processed in 2 lines.
 
 ## Example
 

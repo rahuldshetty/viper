@@ -102,6 +102,15 @@ Token makeToken(Scanner* scanner, TokenType type){
     return token;
 }
 
+Token makeTrimmedToken(Scanner* scanner, TokenType type, int len){
+    Token token;
+    token.type = type;
+    token.line = scanner->line;
+    token.start = scanner->start;
+    token.length = len;
+    return token;
+}
+
 Token errorToken(Scanner* scanner, const char* message){
     Token token;
     token.type = TOKEN_ERROR;
@@ -112,16 +121,65 @@ Token errorToken(Scanner* scanner, const char* message){
 }
 
 Token string(Scanner* scanner, char delimiter){
-    while( peek(scanner) != delimiter && !isAtEnd(scanner)){
-        if(peek(scanner) == '\n') scanner->line++;
-        advance(scanner);
-    }
+    typedef enum {
+        SCAN, ESCAPE
+    } SSMODE;
 
-    if(isAtEnd(scanner)) return errorToken(scanner, "Unterminated string.");
+    bool complete = false;
+    char* start = (char*) scanner->current;
+    char* output = start;
+    SSMODE mode = SCAN;
 
-    // closing quote
-    advance(scanner);
-    return makeToken(scanner, TOKEN_STRING);
+    do {
+        if(isAtEnd(scanner)){
+            return errorToken(scanner, "Unterminated string.");
+        }
+        char ch = advance(scanner);
+        switch (mode){
+            case SCAN:{
+                if(ch==delimiter){
+                    *(output++) = ch;
+                    complete = true;
+                } else if(ch == '\\'){
+                    mode = ESCAPE;
+                } else if(ch == '\0'){
+                    return errorToken(scanner, "Unterminated string.");
+                } else {
+                    *(output++) = ch;
+                }
+                break;
+            }
+            case ESCAPE: {
+                switch (ch){
+                    case '\'':
+                    case '\\':
+                    case '"':
+                        *(output++) = ch;
+						mode = SCAN;
+						break;
+                    case 'n':
+                        *(output++) = '\n';
+						mode = SCAN;
+						break;
+                    case 'r':
+                        *(output++) = '\r';
+						mode = SCAN;
+						break;
+                    case 't':
+                        *(output++) = '\t';
+						mode = SCAN;
+						break;
+                    case '\0':
+                        return errorToken(scanner, "Unterminated string.");
+                    default: return errorToken(scanner, "Invalid escape sequence.");
+                }
+                break;
+            }
+        }
+    } while(!complete);
+
+    int len = output - start;
+    return makeTrimmedToken(scanner, TOKEN_STRING, len + 1);
 }
 
 Token number(Scanner* scanner){

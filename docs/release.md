@@ -2,6 +2,7 @@
 
 ## Alpha: 1.1 [WIP]
 
+- Added support for Escape Characters in String - \n \r \t \' \\
 - Support for switch branching statements.
 - Modulo Operator
 - Single quoted string datatype.
