@@ -18,6 +18,12 @@ print "File content: " + f.read()
 f.close()
 print "File open: " + str(f.is_open())
 
+// Open file in write binary mode
+print "Creating file in binary mode..."
+f = file("sample.txt", "wb")
+f.write(bytes([72, 69, 76, 76, 79, 10, 84, 72, 69, 82, 69]))
+f.close()
+
 // Open file in read binary mode
 print "Reading file in binary mode..."
 f = file("sample.txt", 'rb')

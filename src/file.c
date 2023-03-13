@@ -133,13 +133,12 @@ bool file_write(int argCount, Value self, Value* args){
         return false;
     }
 
-    if(!IS_STRING(args[0])){
-        args[-1] = errorOutput("Expected String datatype for argument to file write method.");
+    if(!IS_STRING(args[0]) && !IS_BYTE(args[0])){
+        args[-1] = errorOutput("Expected string or bytes datatype for argument to file write method.");
         return false;
     }
 
     ObjFile* file = AS_FILE(self);
-    ObjString* string = AS_STRING(args[0]);
 
     // file is opened in read-only mode
     if(strstr(file->mode->chars, "r") != NULL && strstr(file->mode->chars, "+") == NULL){
@@ -158,8 +157,11 @@ bool file_write(int argCount, Value self, Value* args){
     int length;
 
     if(is_binary_mode(file)){
-       
+        ObjByte* bytes = AS_BYTE(args[0]);
+        data = bytes->bytes.byte;
+        length = bytes->bytes.count;       
     } else {
+        ObjString* string = AS_STRING(args[0]);
         data = (unsigned char *) string->chars;
         length = string->length;
     }
