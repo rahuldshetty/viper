@@ -176,6 +176,7 @@ ObjMap* newMap();
 ObjFile* newFile(ObjString* path, ObjString* mode);
 
 ObjByte* newBytes(int length);
+ObjByte* takeBytes(unsigned char* buffer, int length);
 
 ObjString* strObject(Value obj);
 

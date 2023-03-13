@@ -66,7 +66,7 @@ bool file_exists(int argCount, Value self, Value* args){
     return true;
 }
 
-// TODO: Binary file handling, checking readonly mode
+// TODO: checking readonly mode
 bool file_read(int argCount, Value self, Value* args){
     if(argCount != 0){
         args[-1] = errorOutput("Expected 0 argument to read method.");
@@ -117,7 +117,8 @@ bool file_read(int argCount, Value self, Value* args){
     if(buffer != NULL) buffer[bytes_read] = '\0';
 
     if(is_binary_mode(file)){
-        args[-1] = NULL_VAL;
+        ObjByte* obj_byte = takeBytes((unsigned char* )(buffer), bytes_read);
+        args[-1] = OBJ_VAL(obj_byte);
     } else {
         args[-1] = OBJ_VAL(copyString(buffer, file_size + 1));
     }

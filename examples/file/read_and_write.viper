@@ -17,3 +17,9 @@ print "File open: " + str(f.is_open())
 print "File content: " + f.read()
 f.close()
 print "File open: " + str(f.is_open())
+
+// Open file in read binary mode
+print "Reading file in binary mode..."
+f = file("sample.txt", 'rb')
+print "File content: " + str(f.read())
+f.close()

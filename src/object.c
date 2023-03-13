@@ -478,3 +478,10 @@ ObjByte* newBytes(int length){
     initByteArray(&bytes->bytes, length);
     return bytes;
 }
+
+ObjByte* takeBytes(unsigned char* buffer, int length){
+    ObjByte* bytes = ALLOCATE_OBJ(ObjByte, OBJ_BYTE);
+    bytes->bytes.byte = buffer;
+    bytes->bytes.count = length;
+    return bytes;
+}
